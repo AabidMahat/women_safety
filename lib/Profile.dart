@@ -1,0 +1,559 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:women_safety/FeedBack/FeedBackMap.dart';
+import 'package:women_safety/pages/profile/profile.dart';
+import 'package:women_safety/widgets/sidebar/EmergencyContacts.dart';
+
+class SideBarWidget extends StatefulWidget {
+  final Position? currentPosition;
+
+  const SideBarWidget({super.key, this.currentPosition});
+
+  @override
+  State<SideBarWidget> createState() => _SideBarWidgetState();
+}
+
+class _SideBarWidgetState extends State<SideBarWidget> {
+  bool isLoading = true;
+  bool isUserLoading = true;
+  String? staffAccess;
+  late String userId;
+  bool isHandGestureEnabled = false;
+
+  bool isLogOut = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    print("Sidebar $staffAccess");
+    return Scaffold(
+      body: Container(
+          width: MediaQuery.sizeOf(context).width,
+          child: Drawer(
+              backgroundColor: Colors.white,
+              surfaceTintColor: Colors.white,
+              elevation: 16,
+              child: Align(
+                alignment: AlignmentDirectional(-1, -1),
+                child: Container(
+                  width: MediaQuery.sizeOf(context).width,
+                  height: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 0,
+                        color: Colors.blue,
+                        offset: Offset(1, 0),
+                      )
+                    ],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: Colors.blue,
+                      width: 1,
+                    ),
+                    shape: BoxShape.rectangle,
+                  ),
+                  child: Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 16),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(0, 59, 0, 24),
+                          child: Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.indigo[800],
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0x4D9489F5),
+                                  offset: Offset(0, 1),
+                                )
+                              ],
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      16, 20, 16, 16),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: [
+                                      Container(
+                                        width: 95,
+                                        height: 100,
+                                        decoration: BoxDecoration(
+                                          color: Color(0x4D9489F5),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          border: Border.all(
+                                            color: Colors.green.shade900,
+                                            width: 2,
+                                          ),
+                                        ),
+                                        child: Padding(
+                                          padding: EdgeInsets.all(2),
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            child: Image.network(
+                                                'https://images.unsplash.com/photo-1624561172888-ac93c696e10c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NjJ8fHVzZXJzfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=900&q=60'),
+                                          ),
+                                        ),
+                                      ),
+                                       Expanded(
+                                        child: Padding(
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  12, 0, 0, 0),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.max,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Ashwini Patil',
+                                                style: TextStyle(
+                                                  fontFamily:
+                                                      'Plus Jakarta Sans',
+                                                  color: Colors.white,
+                                                  fontSize: 18,
+                                                  letterSpacing: 0,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(0, 4, 0, 0),
+                                                child: Text(
+                                                  '9657882677',
+                                                  style: TextStyle(
+                                                    fontFamily:
+                                                        'Plus Jakarta Sans',
+                                                    color: Color(0x9AFFFFFF),
+                                                    fontSize: 14,
+                                                    letterSpacing: 0,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ),
+                                              Align(
+                                                alignment:
+                                                    AlignmentDirectional(-1, 0),
+                                                child: Padding(
+                                                  padding: EdgeInsetsDirectional
+                                                      .fromSTEB(0, 29, 0, 0),
+                                                  child: InkWell(
+                                                    onTap: (){
+                                                      Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfilePage()));
+                                                    },
+                                                    child: Text(
+                                                      'Edit Profile',
+                                                      style: TextStyle(
+                                                        fontFamily:
+                                                            'Plus Jakarta Sans',
+                                                        color: Color(0x9AFFFFFF),
+                                                        fontSize: 16,
+                                                        letterSpacing: 0,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => EmergencyContacts(),
+                                ));
+                          },
+                          child: Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: 72,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(0),
+                              shape: BoxShape.rectangle,
+                              border: Border.all(
+                                color: Color(0x84BDBDBD),
+                                width: 1,
+                              ),
+                            ),
+                            child: Padding(
+                              padding:
+                                  EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Icon(
+                                    Icons.person_pin_outlined,
+                                    color: Colors.indigo.shade900,
+                                    size: 28,
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        12, 0, 0, 0),
+                                    child: Text(
+                                      'My Emergency Contacts',
+                                      style: TextStyle(
+                                        fontFamily: 'Plus Jakarta Sans',
+                                        color: Colors.indigo.shade800,
+                                        fontSize: 17,
+                                        letterSpacing: 0,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: 72,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(0),
+                            shape: BoxShape.rectangle,
+                            border: Border.all(
+                              color: Color(0x84BDBDBD),
+                              width: 1,
+                            ),
+                          ),
+                          child: Padding(
+                            padding:
+                                EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Icon(
+                                  CupertinoIcons.map_pin_ellipse,
+                                  color: Colors.indigo.shade800,
+                                  size: 28,
+                                ),
+                                Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      12, 0, 0, 0),
+                                  child: Text(
+                                    'Live location',
+                                    style: TextStyle(
+                                      fontFamily: 'Plus Jakarta Sans',
+                                      color: Colors.indigo.shade800,
+                                      fontSize: 17,
+                                      letterSpacing: 0,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Container(
+                          width: double.infinity,
+                          height: 72,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(0),
+                            shape: BoxShape.rectangle,
+                            border: Border.all(
+                              color: Color(0x84BDBDBD),
+                              width: 1,
+                            ),
+                          ),
+                          child: Padding(
+                            padding:
+                                EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Icon(
+                                  Icons.mobile_friendly_rounded,
+                                  color: Colors.indigo.shade800,
+                                  size: 26,
+                                ),
+                                Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      12, 0, 0, 0),
+                                  child: Text(
+                                    'Hand Gesture',
+                                    style: TextStyle(
+                                      fontFamily: 'Plus Jakarta Sans',
+                                      color: Colors.indigo.shade800,
+                                      fontSize: 17,
+                                      letterSpacing: 0,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                                Spacer(),
+                                // Pushes the switch to the end of the row
+                                Switch(
+                                  value: isHandGestureEnabled,
+                                  // this should be a state variable
+                                  onChanged: (bool value) {
+                                    setState(() {
+                                      isHandGestureEnabled =
+                                          value; // update state
+                                    });
+                                  },
+                                  activeColor: Colors.indigo
+                                      .shade800, // Customize the active color
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: 72,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(0),
+                            shape: BoxShape.rectangle,
+                            border: Border.all(
+                              color: Color(0x84BDBDBD),
+                              width: 1,
+                            ),
+                          ),
+                          child: Padding(
+                            padding:
+                                EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Icon(
+                                  Icons.record_voice_over,
+                                  color: Colors.indigo.shade800,
+                                  size: 28,
+                                ),
+                                Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      12, 0, 0, 0),
+                                  child: Text(
+                                    'Voice Commands',
+                                    style: TextStyle(
+                                      fontFamily: 'Plus Jakarta Sans',
+                                      color: Colors.indigo.shade800,
+                                      fontSize: 17,
+                                      letterSpacing: 0,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        InkWell(
+                          onTap: widget.currentPosition != null
+                              ? () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => FeedbackScreen(
+                                              currentPosition: LatLng(
+                                                  widget.currentPosition!
+                                                      .latitude,
+                                                  widget.currentPosition!
+                                                      .longitude))));
+                                }
+                              : null,
+                          child: Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: 72,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(0),
+                              shape: BoxShape.rectangle,
+                              border: Border.all(
+                                color: Color(0x84BDBDBD),
+                                width: 1,
+                              ),
+                            ),
+                            child: Padding(
+                              padding:
+                                  EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Icon(
+                                    Icons.feedback_outlined,
+                                    color: Colors.indigo.shade800,
+                                    size: 28,
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        12, 0, 0, 0),
+                                    child: Text(
+                                      'Feedbacks',
+                                      style: TextStyle(
+                                        fontFamily: 'Plus Jakarta Sans',
+                                        color: Colors.indigo.shade800,
+                                        fontSize: 17,
+                                        letterSpacing: 0,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: 72,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(0),
+                            shape: BoxShape.rectangle,
+                            border: Border.all(
+                              color: Color(0x84BDBDBD),
+                              width: 1,
+                            ),
+                          ),
+                          child: Padding(
+                            padding:
+                                EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Icon(
+                                  Icons.settings,
+                                  color: Colors.indigo.shade800,
+                                  size: 28,
+                                ),
+                                Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      12, 0, 0, 0),
+                                  child: Text(
+                                    'Settings',
+                                    style: TextStyle(
+                                      fontFamily: 'Plus Jakarta Sans',
+                                      color: Colors.indigo.shade800,
+                                      fontSize: 17,
+                                      letterSpacing: 0,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            padding:
+                                EdgeInsetsDirectional.fromSTEB(16, 0, 16, 16),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      12, 0, 12, 0),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.6,
+                                        child: Align(
+                                          alignment: AlignmentDirectional(0, 0),
+                                          child: ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              padding: EdgeInsets.zero,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(24),
+                                              ),
+                                              primary: Colors.indigo.shade800,
+                                            ),
+                                            onPressed: () {},
+                                            child: Padding(
+                                              padding: EdgeInsetsDirectional
+                                                  .fromSTEB(24, 0, 24, 0),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  // FaIcon(
+                                                  //   Icons.logout_sharp,
+                                                  //   color: Colors.white,
+                                                  //   size: 26,
+                                                  // ),
+                                                  SizedBox(width: 12),
+                                                  Text(
+                                                    'Log Out',
+                                                    style: TextStyle(
+                                                      fontFamily:
+                                                          'Plus Jakarta Sans',
+                                                      color: Colors.white,
+                                                      fontSize: 20,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Align(
+                                  alignment: AlignmentDirectional(0, 0),
+                                  child: Text(
+                                    'App version 1.0.0',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontFamily: 'Readex Pro',
+                                      color: Colors.indigo.shade800,
+                                      letterSpacing: 0,
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ))),
+    );
+  }
+}

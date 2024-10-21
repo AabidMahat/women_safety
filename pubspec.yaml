@@ -1,0 +1,62 @@
+name: women_safety
+description: "A new Flutter project."
+
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.5 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  #Design
+  cupertino_icons: ^1.0.2
+  font_awesome_flutter:
+  carousel_slider: ^4.1.1
+  webview_flutter: ^3.0.1
+
+  #  Phone and url
+  flutter_phone_direct_caller: ^2.1.1
+  contacts_service: ^0.6.3
+  fast_contacts:
+
+  url_launcher: ^6.1.5
+
+  #  Toastification
+  fluttertoast: ^8.0.9
+
+  #  Maps
+  google_maps_flutter:
+  latlng:
+  latlong2:
+  geolocator:
+  flutter_polyline_points:
+  location:
+
+  #Permission
+  permission_handler: ^10.2.0
+  #  Otp
+  pinput:
+
+  firebase_core:
+  shared_preferences:
+  #  web socket
+
+  web_socket_channel:
+
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+flutter:
+
+  uses-material-design: true
+
+  assets:
+    - assets/
+
+
