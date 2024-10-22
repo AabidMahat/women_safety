@@ -1,5 +1,6 @@
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class PermissionApi {
   Position? _currentPosition;
@@ -41,6 +42,19 @@ class PermissionApi {
     } catch (e) {
       Fluttertoast.showToast(msg: "Failed to get current location: $e");
       return null;
+    }
+  }
+
+  Future<void> requestPhoneStatePermission() async {
+    final status = await Permission.phone.request();
+    if (!status.isGranted) {
+      Fluttertoast.showToast(msg: 'Phone state permission is not granted');
+    }
+  }
+  Future<void> requestSmsPermission()async{
+    final status = await Permission.sms.request();
+    if(!status.isGranted){
+      Fluttertoast.showToast(msg: 'Sms permission is not granted');
     }
   }
 }

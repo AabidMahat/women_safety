@@ -30,20 +30,23 @@ class FeedbackData {
       },
       category: feedback['category'],
       comments: feedback['comment'],
-      timestamp: DateTime.tryParse(feedback['timestamp'] ?? '') ?? DateTime.now(),
+      timestamp:
+          DateTime.tryParse(feedback['timestamp'] ?? '') ?? DateTime.now(),
 
       // Handle the case where userId may not be present
       userName: feedback['userId'] != null ? feedback['userId']['name'] : null,
       userRole: feedback['userId'] != null ? feedback['userId']['role'] : null,
 
       // Handle the case where guardianId may not be present
-      guardianName: feedback['guardianId'] != null ? feedback['guardianId']['name'] : null,
-      guardianRole: feedback['guardianId'] != null ? feedback['guardianId']['role'] : null,
+      guardianName: feedback['guardianId'] != null
+          ? feedback['guardianId']['name']
+          : null,
+      guardianRole: feedback['guardianId'] != null
+          ? feedback['guardianId']['role']
+          : null,
     );
   }
 }
-
-
 
 class UserData {
   final String id;
@@ -94,7 +97,7 @@ class User {
     return {
       "name": name,
       "email": email,
-      "phone": phoneNumber,  // Map field names accordingly
+      "phone": phoneNumber, // Map field names accordingly
       "password": password,
       "confirmPassword": confirmPassword,
       "role": role,
@@ -111,7 +114,8 @@ class Guardian {
   final String phoneNumber;
   final String password;
   final String role;
-  final List<Map<String, String>>? userId; // List of maps containing name and phone (as String)
+  final List<Map<String, String>>?
+      userId; // List of maps containing name and phone (as String)
 
   Guardian({
     required this.id,
@@ -137,11 +141,29 @@ class Guardian {
       role: guardian['role'],
       userId: guardian['userId'] != null
           ? (guardian['userId'] as List<dynamic>)
-          .map((user) => Map<String, String>.from(user as Map))
-          .toList()
+              .map((user) => Map<String, String>.from(user as Map))
+              .toList()
           : null,
     );
   }
 }
 
+class AudioFile {
+  final String url;
+  final String name;
+  DateTime uploadTime;
 
+  AudioFile({
+    required this.url,
+    required this.name,
+    required this.uploadTime,
+  });
+}
+
+class VideoFile {
+  final String url;
+  final String name;
+  DateTime uploadTime;
+
+  VideoFile({required this.url, required this.name, required this.uploadTime});
+}

@@ -31,8 +31,8 @@ class AdvanceButton extends StatelessWidget {
                 },
           child: isLoading
               ? SizedBox(
-                  width: 20,
-                  height: 20,
+                  width: 30,
+                  height: 30,
                   child: CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                   ),

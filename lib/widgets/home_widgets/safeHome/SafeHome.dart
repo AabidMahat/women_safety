@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:women_safety/LiveLocation/LiveLocation.dart';
+import 'package:women_safety/api/sendNotification.dart';
+import 'package:women_safety/utils/SmsTemplate.dart';
+import 'package:women_safety/widgets/makeCallConfirmation.dart';
 
 class SafeHome extends StatelessWidget {
   const SafeHome({super.key});
-
   showModelSafeHome(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -24,6 +28,7 @@ class SafeHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return InkWell(
       onTap: () => showModelSafeHome(context),
       child: Card(
@@ -66,7 +71,11 @@ class SafeHome extends StatelessWidget {
                     ),
                     const SizedBox(height: 15),
                     ElevatedButton(
-                      onPressed: () => showModelSafeHome(context),
+                      onPressed: ()async {
+                        SharedPreferences pref = await SharedPreferences.getInstance();
+                        String? phoneNumber = pref.getString("phoneNumber");
+                        showConfirmationModal(context,phoneNumber!);
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green.shade900,
                         shape: RoundedRectangleBorder(

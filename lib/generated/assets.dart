@@ -17,6 +17,7 @@ class Assets {
   static const String assetsDefault = 'assets/default.png';
   static const String assetsFlame = 'assets/flame.jpg';
   static const String assetsHospital = 'assets/Hospital.png';
+  static const String assetsLogo = 'assets/logo.png';
   static const String assetsPharmacy = 'assets/pharmacy.png';
   static const String assetsPolice = 'assets/police.jpg';
   static const String assetsPolicebadge = 'assets/policebadge.png';

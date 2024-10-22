@@ -21,6 +21,8 @@ dependencies:
   flutter_phone_direct_caller: ^2.1.1
   contacts_service: ^0.6.3
   fast_contacts:
+  phone_state:
+
 
   url_launcher: ^6.1.5
 
@@ -40,18 +42,52 @@ dependencies:
   #  Otp
   pinput:
 
-  firebase_core:
   shared_preferences:
   #  web socket
 
   web_socket_channel:
 
+  #    Firebase
+  firebase_core:
+  firebase_messaging:
+  firebase_analytics:
+  cloud_firestore:
+  firebase_storage:
+  flutter_local_notifications:
+
+  #  Splash Screen
+
+  flutter_native_splash: ^2.3.10
+  animated_splash_screen:
+
+  #    Sms
+  background_sms:
+
+  #  Audio
+  flutter_sound:
+  audioplayers:
+  #Date format
+  intl:
+
+  #    Video Dependencies
+  camera:
+  video_player:
+  dio:
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: "^0.13.1"
   flutter_lints: ^2.0.0
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/womenSafety-app.png"
+  min_sdk_android: 30
+
+
 flutter:
 
   uses-material-design: true

@@ -3,7 +3,10 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  audioplayers_windows
+  cloud_firestore
   firebase_core
+  firebase_storage
   geolocator_windows
   permission_handler_windows
   url_launcher_windows

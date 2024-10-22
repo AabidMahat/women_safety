@@ -17,7 +17,7 @@ import '../pages/LogIn/Login.dart';
 class LoginApi {
   Future<void> login(
       String phoneNumber, String passworrd, BuildContext context) async {
-    String url = "$MAINURL/api/v3/guardian/logIn";
+    String url = "$MAINURL/api/v3/user/logIn";
     try {
       var body = {"phoneNumber": phoneNumber, "password": passworrd};
       var response = await http.post(Uri.parse(url),
@@ -30,6 +30,7 @@ class LoginApi {
         print(response.body);
         SharedPreferences preferences = await SharedPreferences.getInstance();
         preferences.setString("userId", body['data']["_id"]);
+        preferences.setString("phoneNumber", body['data']['phoneNumber']);
 
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => HomeScreen()));
@@ -43,31 +44,32 @@ class LoginApi {
     }
   }
 
-  Future<void> signUp(User user,BuildContext context) async {
-    String url = "$MAINURL/api/v3/guardian/signUp";
+  Future<void> signUp(User user, BuildContext context) async {
+    String url = "$MAINURL/api/v3/user/signUp";
     try {
-
       var body = {
-        "name":user.name,
-        "email":user.email,
-        "phoneNumber":user.phoneNumber,
-        "password":user.password,
-        "confirmPassword":user.confirmPassword,
-        "role":"guardian"
+        "name": user.name,
+        "email": user.email,
+        "phoneNumber": user.phoneNumber,
+        "password": user.password,
+        "confirmPassword": user.confirmPassword,
+        "role": "guardian"
       };
 
       var response = await http.post(Uri.parse(url),
           body: json.encode(body),
           headers: {"Content-Type": "application/json"});
 
-
-      if(response.statusCode==200){
+      if (response.statusCode == 200) {
         var body = json.decode(response.body);
 
         Fluttertoast.showToast(msg: body['message']);
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>OtpScreen(phoneNumber: user.phoneNumber)));
-      }
-      else{
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    OtpScreen(phoneNumber: user.phoneNumber)));
+      } else {
         var body = json.decode(response.body);
         Fluttertoast.showToast(msg: body['message']);
         print(body);
@@ -77,23 +79,21 @@ class LoginApi {
     }
   }
 
-  Future<void> verifyOtp(int otp,String phoneNumber,BuildContext context)async{
-    String url = "$MAINURL/api/v3/guardian/verifyOtp";
-    var body={
-      "otp":otp,
-      "phoneNumber":phoneNumber
-    };
+  Future<void> verifyOtp(
+      int otp, String phoneNumber, BuildContext context) async {
+    String url = "$MAINURL/api/v3/user/verifyOtp";
+    var body = {"otp": otp, "phoneNumber": phoneNumber};
     try {
       var response = await http.post(Uri.parse(url),
           body: json.encode(body),
           headers: {"Content-Type": "application/json"});
 
-      if(response.statusCode==200){
+      if (response.statusCode == 200) {
         var body = json.decode(response.body);
         Fluttertoast.showToast(msg: body['message']);
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>NewLoginPage()));
-      }
-      else{
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => NewLoginPage()));
+      } else {
         var body = json.decode(response.body);
         Fluttertoast.showToast(msg: body['message']);
         print(body);
@@ -102,17 +102,17 @@ class LoginApi {
       Fluttertoast.showToast(msg: err.toString());
     }
   }
-  Future<void> resendOtp(String phoneNumber,BuildContext context)async{
-    String url = "$MAINURL/api/v3/guardian/resendOtp/$phoneNumber";
+
+  Future<void> resendOtp(String phoneNumber, BuildContext context) async {
+    String url = "$MAINURL/api/v3/user/resendOtp/$phoneNumber";
 
     try {
       var response = await http.get(Uri.parse(url));
 
-      if(response.statusCode==200){
+      if (response.statusCode == 200) {
         var body = json.decode(response.body);
         Fluttertoast.showToast(msg: body['message']);
-      }
-      else{
+      } else {
         var body = json.decode(response.body);
         Fluttertoast.showToast(msg: body['message']);
         print(body);

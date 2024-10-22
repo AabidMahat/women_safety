@@ -1,17 +1,32 @@
+
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:women_safety/home_screen.dart';
+import '../../api/Firebase_api.dart';
 import '../../api/loginApi.dart';
+import '../../firebase_options.dart';
 import '../../widgets/Button/ResuableButton.dart';
 import '../../widgets/TextField/TextField.dart';
 import '../../widgets/modalWindow.dart';
 import '../SignUp/Register.dart';
 
 
+final navigatorKey = GlobalKey<NavigatorState>();
 
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await FirebaseApi().initNotification();
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
+    navigatorKey: navigatorKey,
     home: NewLoginPage(),
+    routes: {
+      "/home":(context)=>HomeScreen()
+    },
   ));
 }
 
