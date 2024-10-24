@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:women_safety/api/Permission.dart';
 import 'package:women_safety/pages/profile/updatePassword.dart';
 import 'package:women_safety/widgets/Button/ResuableButton.dart';
 import 'package:women_safety/widgets/TextField/TextField.dart';
@@ -32,6 +33,10 @@ class _UpdateProfileState extends State<UpdateProfile> {
   List<Map<String, String>> assignedUsers = [];
   List<String> userRemoved = [];
   bool isLoading = false;
+  bool isImageStored = false;
+  String? avatarUrl;
+  PermissionApi permissionApi = PermissionApi();
+
 
   @override
   void initState() {
@@ -56,9 +61,22 @@ class _UpdateProfileState extends State<UpdateProfile> {
     print("Assigned User $assignedUsers");
   }
 
+  void saveImage() async {
+    setState(() {
+      isImageStored = true;
+    });
+    String url = await guardianApi.pickAndUploadImage();
+    setState(() {
+      avatarUrl = url;
+      isImageStored = false;
+    });
+    print(url);
+  }
+
   void updateGuardian() async {
     try {
       var updateBody = {
+        "avatar": avatarUrl,
         "name": name.text,
         "email": email.text,
         "address": address.text,
@@ -105,10 +123,10 @@ class _UpdateProfileState extends State<UpdateProfile> {
                     child: CircleAvatar(
                       radius: 60,
                       backgroundImage: widget.guardian.avatar == "default.png"
-                          ? const NetworkImage(
-                              'https://images.unsplash.com/photo-1624561172888-ac93c696e10c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NjJ8fHVzZXJzfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=900&q=60', // Placeholder avatar
+                          ? const AssetImage(
+                              "default.png", // Placeholder avatar
                             )
-                          : AssetImage(widget.guardian.avatar)
+                          : NetworkImage(widget.guardian.avatar)
                               as ImageProvider, // Assuming the avatar is a local asset
                     ),
                   ),
@@ -124,7 +142,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       child: IconButton(
                         icon: const Icon(Icons.camera_alt, color: Colors.white),
                         onPressed: () {
-                          // Add functionality for changing the profile picture
+                          saveImage();
                         },
                       ),
                     ),
@@ -250,7 +268,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
               },
               buttonText: "Save Profile",
               backgroundColor: Colors.green.shade900,
-              isLoading: isLoading,
+              isLoading: isImageStored,
             )),
             const SizedBox(width: 10),
             Expanded(

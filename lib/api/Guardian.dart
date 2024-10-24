@@ -1,14 +1,18 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:women_safety/Database/Database.dart';
+import 'package:women_safety/api/Firebase_api.dart';
 import 'package:women_safety/pages/profile/profile.dart';
 
 import '../consts/AppConts.dart';
 import 'package:http/http.dart' as http;
 
 class GuardianApi {
+  FirebaseApi firebaseApi = FirebaseApi();
+
   Future<Guardian?> getGuardian() async {
     Guardian guardian;
     try {
@@ -63,6 +67,20 @@ class GuardianApi {
     } catch (err) {
       print("Exception occurred: $err");
       Fluttertoast.showToast(msg: "Error fetching users: $err");
+    }
+  }
+
+  Future<String> pickAndUploadImage() async {
+    final ImagePicker _picker = ImagePicker();
+
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      String downloadUrl = await firebaseApi.saveProfileImage(image.path);
+      return downloadUrl;
+    } else {
+      Fluttertoast.showToast(msg: "Error while storing image");
+      return "";
     }
   }
 }

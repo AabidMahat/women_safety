@@ -82,14 +82,17 @@ class _ProfilePageState extends State<ProfilePage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             const SizedBox(height: 20),
-                            const CircleAvatar(
+                            CircleAvatar(
                               radius: 60,
                               backgroundColor: Colors.white,
                               child: CircleAvatar(
                                 radius: 55,
-                                backgroundImage: NetworkImage(
-                                  'https://images.unsplash.com/photo-1624561172888-ac93c696e10c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NjJ8fHVzZXJzfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=900&q=60', // Placeholder avatar
-                                ),
+                                backgroundImage: guardian!.avatar == null
+                                    ? const AssetImage(
+                                        "default.png", // Placeholder avatar
+                                      )
+                                    : NetworkImage(guardian!.avatar)
+                                        as ImageProvider,
                               ),
                             ),
                             const SizedBox(height: 20),

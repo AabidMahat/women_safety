@@ -2,9 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:women_safety/api/EmergencyCall.dart';
 import 'package:women_safety/api/Permission.dart';
@@ -72,7 +70,11 @@ class _HomeScreenState extends State<HomeScreen> {
   void getSmsPermission()async{
     await permissionApi.requestSmsPermission();
   }
-  
+
+  void getStoragePermission()async{
+    await permissionApi.requestStoragePermission();
+  }
+
   Future<void> userLocation(Position location)async{
     SharedPreferences preferences = await SharedPreferences.getInstance();
     preferences.setString("userLocation", json.encode(location));
@@ -142,7 +144,8 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Icon(Icons.call_end,size: 28,),
           ),
           bottomNavigationBar: BottomNavigationBar(
-            elevation: 3,
+
+            elevation: 5,
             items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
                 icon: Icon(Icons.home, size: 28), // Set a fixed size
@@ -185,3 +188,15 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+// addtional Part
+// case 1:
+// // Stop alert sound
+//   smsAlert.stopAlertSound();
+//   break;
+// case 2:
+// // Send video recording notification
+//   sendNotification.sendVideoRecordingNotification();
+//   break;
+// case 3:
+//   sendNotification.triggerRecording();
+//   break;

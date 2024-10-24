@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -32,7 +31,7 @@ class _LiveLocationState extends State<LiveLocation> {
   Location _locationController = new Location();
 
   final Completer<GoogleMapController> _mapController =
-      Completer<GoogleMapController>();
+  Completer<GoogleMapController>();
 
   LatLng? _currentPosition = null;
 
@@ -41,19 +40,14 @@ class _LiveLocationState extends State<LiveLocation> {
   LatLng initialPosition = LatLng(16.69531, 74.1987433);
   LatLng finalPosition = LatLng(16.6984, 74.2289);
 
-  List<LatLng> currentRoute = [];
-
   Map<PolylineId, Polyline> polylines = {};
-  double BUFFER_ZONE_RADIUS = 500;
 
   Set<Circle> _circles = {};
-
-  List<LatLng> polylineCoords = [];
 
   MapApi mapAPI = new MapApi();
 
   late IOWebSocketChannel _webSocketChannel;
-  String? userId;
+  String ? userId;
 
   @override
   void initState() {
@@ -64,7 +58,7 @@ class _LiveLocationState extends State<LiveLocation> {
         .then((routes) => displayRoutesOnMap(routes)));
   }
 
-  void getUserId() async {
+  void getUserId()async{
     SharedPreferences preferences = await SharedPreferences.getInstance();
     userId = preferences.getString('userId');
   }
@@ -72,8 +66,8 @@ class _LiveLocationState extends State<LiveLocation> {
   // Connect to web socket
 
   void _connectWebSocket() {
-    _webSocketChannel =
-        IOWebSocketChannel.connect('${WEBSOCKETURL}/live-location');
+    _webSocketChannel = IOWebSocketChannel.connect(
+        '${WEBSOCKETURL}/live-location');
     // IOWebSocketChannel.connect('ws://10.0.2.2:3000/live-location');
 
     _webSocketChannel.stream.listen((message) {
@@ -84,73 +78,8 @@ class _LiveLocationState extends State<LiveLocation> {
           _currentPosition = LatLng(data['latitude'], data['longitude']);
           _updateCircle();
         });
-
-        if (polylineCoords != null && polylineCoords.isNotEmpty) {
-          double distance = getDistance(
-              LatLng(data['latitude'], data['longitude']), polylineCoords);
-          if (distance > BUFFER_ZONE_RADIUS) {
-            Fluttertoast.showToast(
-                msg:
-                    "you are out of buffer zone! you are ${distance} km away from the route.");
-          } else {
-            Fluttertoast.showToast(
-                msg:
-                    "you are inside buffer zone and ${distance} km away from the route.");
-          }
-        }
       }
     });
-  }
-
-  // function for generating buffer zones along the route
-  void generateBufferZones(List<LatLng> polylineCoords) {
-    Set<Circle> bufferCircles = {};
-    _circles.clear();
-
-    print("*(**************) $polylineCoords");
-
-    for (LatLng point in polylineCoords) {
-      bufferCircles.add(Circle(
-        circleId: CircleId(point.toString()),
-        center: point,
-        radius: BUFFER_ZONE_RADIUS,
-        // Set the radius to your buffer zone
-        strokeColor: Colors.green.withOpacity(0.6),
-        strokeWidth: 2,
-        fillColor: Colors.green.withOpacity(0.6),
-      ));
-    }
-
-    setState(() {
-      _circles.addAll(bufferCircles); // Add buffer circles to the existing set
-    });
-  }
-
-// helper funsction for calculating distance between two locations without any unnecsssary api call
-  double calculateDistance(lat1, lon1, lat2, lon2) {
-    var p = 0.017453292519943295;
-    var c = cos;
-    var a = 0.5 -
-        c((lat2 - lat1) * p) / 2 +
-        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
-    return 12742 * asin(sqrt(a));
-  }
-
-// function for getting minimum distance between user's current location and all points throught the route.
-  double getDistance(LatLng userLocation, List<LatLng> route) {
-    // final lat_lng.Distance distance = lat_lng.Distance();
-
-    double totalDistance = double.infinity;
-
-    for (var point in route) {
-      double dist = calculateDistance(userLocation.longitude,
-          userLocation.latitude, point.longitude, point.latitude);
-
-      if (dist < totalDistance) {
-        totalDistance = dist;
-      }
-    }
-    return (totalDistance * 100).round() / 100;
   }
 
   Future<void> getLocationAndUpdate() async {
@@ -174,8 +103,7 @@ class _LiveLocationState extends State<LiveLocation> {
         return;
       }
     }
-    _locationController.changeSettings(
-        accuracy: LocationAccuracy.high, distanceFilter: 30, interval: 10000);
+    _locationController.changeSettings(interval: 1000);
     _locationController.onLocationChanged
         .listen((LocationData currentLocation) {
       if (currentLocation.latitude != null &&
@@ -200,7 +128,6 @@ class _LiveLocationState extends State<LiveLocation> {
       }
     });
   }
-
   Future<List<List<LatLng>>> getRoutesWithAlternatives() async {
     String url =
         "https://maps.googleapis.com/maps/api/directions/json?origin=${initialPosition.latitude},${initialPosition.longitude}&destination=${finalPosition.latitude},${finalPosition.longitude}&key=$GOOGLE_API_KEY&alternatives=true";
@@ -317,7 +244,7 @@ class _LiveLocationState extends State<LiveLocation> {
           Circle(
               circleId: CircleId("currentLocationCircle"),
               center: _currentPosition!,
-              radius: 3,
+              radius: 10,
               strokeColor: Colors.blueAccent,
               strokeWidth: 2,
               fillColor: Colors.blueAccent.withOpacity(0.2)),
@@ -345,7 +272,7 @@ class _LiveLocationState extends State<LiveLocation> {
       width: MediaQuery.of(context).size.width * 0.9,
       child: TextFormField(
         style: TextStyle(
-          color: Colors.white,
+          color: Colors.white, // Set text color to white
           fontFamily: 'Readex Pro',
         ),
         keyboardType: TextInputType.name,
@@ -360,11 +287,8 @@ class _LiveLocationState extends State<LiveLocation> {
             });
 
             // Once final location is set, generate the polyline route
-            getLocationAndUpdate()
-                .then((_) => getRoutesWithAlternatives().then((routes) {
-                      displayRoutesOnMap(routes);
-                      generateBufferZones(routes[0]);
-                    }));
+            getLocationAndUpdate().then((_) => getRoutesWithAlternatives()
+                .then((routes) => displayRoutesOnMap(routes)));
 
             //   Fetch Distance and Time
 
@@ -375,7 +299,7 @@ class _LiveLocationState extends State<LiveLocation> {
                 _showDistanceAndTime(result['distance'], result['duration']);
                 Fluttertoast.showToast(
                     msg:
-                        "Distance: ${result['distance']} | Duration: ${result['duration']}");
+                    "Distance: ${result['distance']} | Duration: ${result['duration']}");
               } else {
                 Fluttertoast.showToast(msg: 'Failed to get distance and time');
               }
@@ -425,44 +349,44 @@ class _LiveLocationState extends State<LiveLocation> {
     return Scaffold(
       body: _currentPosition == null
           ? Center(
-              child: CircularProgressIndicator(
-                color: Colors.green.shade900,
-              ),
-            )
+        child: CircularProgressIndicator(
+          color: Colors.green.shade900,
+        ),
+      )
           : Stack(
-              children: [
-                // The Google Map
-                GoogleMap(
-                  onMapCreated: ((GoogleMapController controller) =>
-                      _mapController.complete(controller)),
-                  initialCameraPosition:
-                      CameraPosition(target: initialPosition, zoom: 15),
-                  markers: {
-                    Marker(
-                      markerId: MarkerId("initialLocation"),
-                      icon: BitmapDescriptor.defaultMarkerWithHue(
-                          BitmapDescriptor.hueYellow),
-                      position: initialPosition,
-                    ),
-                    Marker(
-                      markerId: MarkerId("finalLocation"),
-                      icon: BitmapDescriptor.defaultMarker,
-                      position: finalPosition,
-                    ),
-                  },
-                  polylines: Set<Polyline>.of(polylines.values),
-                  circles: _circles,
-                ),
+        children: [
+          // The Google Map
+          GoogleMap(
+            onMapCreated: ((GoogleMapController controller) =>
+                _mapController.complete(controller)),
+            initialCameraPosition:
+            CameraPosition(target: initialPosition, zoom: 15),
+            markers: {
+              Marker(
+                markerId: MarkerId("initialLocation"),
+                icon: BitmapDescriptor.defaultMarkerWithHue(
+                    BitmapDescriptor.hueYellow),
+                position: initialPosition,
+              ),
+              Marker(
+                markerId: MarkerId("finalLocation"),
+                icon: BitmapDescriptor.defaultMarker,
+                position: finalPosition,
+              ),
+            },
+            polylines: Set<Polyline>.of(polylines.values),
+            circles: _circles,
+          ),
 
-                // Position the search bar at the top
-                Positioned(
-                  top: 70.0, // Adjust the top position as needed
-                  left: 15.0,
-                  right: 15.0,
-                  child: _buildSearchbar(),
-                ),
-              ],
-            ),
+          // Position the search bar at the top
+          Positioned(
+            top: 70.0, // Adjust the top position as needed
+            left: 15.0,
+            right: 15.0,
+            child: _buildSearchbar(),
+          ),
+        ],
+      ),
     );
   }
 }

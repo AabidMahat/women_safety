@@ -1,6 +1,7 @@
 import 'dart:async'; // For Timer
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:women_safety/LiveLocation/live-location.dart';
 import 'package:women_safety/api/EmergencyCall.dart';
 import 'dart:ui';
 import '../LiveLocation/LiveLocation.dart'; // For BackdropFilter
@@ -87,16 +88,16 @@ void showConfirmationModal(BuildContext context, String phoneNumber) {
                     ElevatedButton(
                       onPressed: () {
                         // Call the API to initiate the first call
-                        emergencyCallApi.makeCall(phoneNumber);
+                        // emergencyCallApi.makeCall(phoneNumber);
 
                         isConfirmed = true;
 
-                        startCallScheduler(context, phoneNumber);
+                        // startCallScheduler(context, phoneNumber);
 
                         // Close the modal
                         Navigator.pop(context);
 
-                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LiveLocation()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => LiveLocation()));
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green.withOpacity(0.9),

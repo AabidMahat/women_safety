@@ -57,4 +57,19 @@ class PermissionApi {
       Fluttertoast.showToast(msg: 'Sms permission is not granted');
     }
   }
+
+  Future<void> requestStoragePermission()async{
+    final status = await Permission.storage.request();
+    if(!status.isGranted){
+      Fluttertoast.showToast(msg: 'Storage permission is not granted');
+
+    }
+  }
+  Future<void> requestCameraPermission()async{
+    final status = await Permission.camera.request();
+    if(!status.isGranted){
+      Fluttertoast.showToast(msg: 'Camera permission is not granted');
+
+    }
+  }
 }

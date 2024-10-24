@@ -190,4 +190,19 @@ class FirebaseApi {
     }
     return audioFiles;
   }
+
+  Future<String> saveProfileImage(String filePath) async {
+    try {
+      Reference ref = _storage.ref().child("images/${DateTime.now()}.jpg");
+
+      await ref.putFile(File(filePath));
+
+      String downloadUrl = await ref.getDownloadURL();
+
+      return downloadUrl;
+    } catch (err) {
+      print("Failed to upload image: $err");
+      return "";
+    }
+  }
 }

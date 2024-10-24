@@ -9,19 +9,25 @@ import 'package:women_safety/consts/AppConts.dart';
 import 'package:women_safety/utils/SmsTemplate.dart';
 
 class EmergencyCallApi {
-
   PhoneStateStatus? _callState;
   bool isCallAnswered = false; // Track if the call was answered
   SendNotification sendNotification = SendNotification();
-  Timer ? smsTimer;
-  String ? phoneNumber;
+  Timer? smsTimer;
+  String? phoneNumber;
+
   void startListening() {
     PhoneState.stream.listen((PhoneState state) {
       _callState = state.status;
+      print("*************************************************");
+      phoneNumber = state.number;
+
+      print("Phone Number $phoneNumber");
 
       if (_callState == PhoneStateStatus.CALL_STARTED) {
-        Fluttertoast.showToast(msg: "Your Route is being monitored");
-        isCallAnswered = false; // Reset flag when the call starts
+        if (phoneNumber != null && phoneNumber!.startsWith('+18')) {
+          Fluttertoast.showToast(msg: "Your Route is being monitored");
+          isCallAnswered = false;
+        }
         return;
       }
 
@@ -30,19 +36,24 @@ class EmergencyCallApi {
       }
 
       if (_callState == PhoneStateStatus.CALL_INCOMING) {
-        isCallAnswered = false; // Mark call as answered
+        if (phoneNumber != null && phoneNumber!.startsWith('+18')) {
+          Fluttertoast.showToast(msg: "Incoming call from Japan");
+          isCallAnswered = false; // Mark call as not answered yet
+        }
       }
     });
   }
 
   Future<void> _onCallEnd() async {
-    if (!isCallAnswered) { // Only send notification if the call was not answered
-      sendNotification.sendNotification(
-          "Call Notification", "Tap to cancel SOS message (within 10 secs)");
+    if (!isCallAnswered) {
+      if (phoneNumber != null && phoneNumber!.startsWith('+18')) {
+        sendNotification.sendNotification(
+            "Call Notification", "Tap to cancel SOS message (within 10 secs)");
 
-      smsTimer  = Timer(Duration(seconds: 10),(){
-        sendSMS();
-      });
+        smsTimer = Timer(Duration(seconds: 10), () {
+          sendSMS();
+        });
+      }
     } else {
       print("Call was answered, notification not sent.");
     }
@@ -55,7 +66,6 @@ class EmergencyCallApi {
       Fluttertoast.showToast(msg: "SOS message canceled");
     }
   }
-
 
   Future<void> makeCall(String phoneNumber) async {
     final String url = "${MAINURL}/api/v3/notification/makeCall";
