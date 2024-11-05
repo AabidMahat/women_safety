@@ -31,6 +31,7 @@ class LoginApi {
         SharedPreferences preferences = await SharedPreferences.getInstance();
         preferences.setString("userId", body['data']["_id"]);
         preferences.setString("phoneNumber", body['data']['phoneNumber']);
+        preferences.setString("username", body['data']['name']);
 
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => HomeScreen()));

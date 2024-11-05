@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:women_safety/Database/Database.dart';
 import 'package:women_safety/api/Firebase_api.dart';
@@ -30,10 +31,9 @@ class GuardianApi {
         var body = json.decode(response.body);
         var guardianData = body['data'];
 
-        print("Guardian $guardianData");
-
+        print("guardian ${guardianData}");
         guardian = Guardian.fromJson(guardianData);
-        Fluttertoast.showToast(msg: "Guardian data fetched successfully");
+
         return guardian;
       } else {
         Fluttertoast.showToast(msg: "Error: Unexpected data format");
@@ -43,6 +43,38 @@ class GuardianApi {
       print("Exception occurred: $err");
       Fluttertoast.showToast(msg: "Error fetching users: $err");
       return null;
+    }
+  }
+
+  Future<void> updateUserList(List<String> assignedUserId, BuildContext context) async {
+    try {
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+      String? userId = preferences.getString("userId");
+
+
+      print("UserIds ${assignedUserId}");
+
+      String url = "$MAINURL/api/v3/guardian/updateUserList/$userId";
+
+      var body = {"userId": assignedUserId};
+      var response = await http.patch(Uri.parse(url),
+          body: json.encode(body),
+          headers: {"Content-Type": "application/json"});
+
+      if (response.statusCode == 200) {
+        Fluttertoast.showToast(msg: "Update sucessful");
+        Navigator.pushReplacement(
+            context,
+            PageTransition(
+                child: ProfilePage(),
+                type: PageTransitionType.rightToLeft,
+                duration: Duration(milliseconds: 400)));
+      }else{
+        var data = json.decode(response.body);
+        print("Error while updating data ${data['message']}");
+      }
+    } catch (err) {
+      print("Error while updating user list $err");
     }
   }
 

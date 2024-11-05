@@ -1,6 +1,7 @@
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:women_safety/api/User.dart';
 
 import '../api/Firebase_api.dart';
 
@@ -41,7 +42,8 @@ class AudioRecordingService {
     Fluttertoast.showToast(msg: "Recording Completed...");
 
     if (audioPath != null) {
-      await firebaseApi.uploadAudio(audioPath!);
+      String audioUrl = await firebaseApi.uploadAudio(audioPath!);
+      await UserApi().addAudioOrVideo({"audioUrl":audioUrl});
     } else {
       Fluttertoast.showToast(msg: "Recording file not found!");
     }

@@ -18,10 +18,14 @@ class Assets {
   static const String assetsFlame = 'assets/flame.jpg';
   static const String assetsHospital = 'assets/Hospital.png';
   static const String assetsLogo = 'assets/logo.png';
+  static const String assetsMainLogo = 'assets/main_logo.png';
+  static const String assetsNoData = 'assets/no_data.gif';
+  static const String assetsNotFound = 'assets/not_found.gif';
   static const String assetsPharmacy = 'assets/pharmacy.png';
   static const String assetsPolice = 'assets/police.jpg';
   static const String assetsPolicebadge = 'assets/policebadge.png';
   static const String assetsRoute = 'assets/route.png';
+  static const String assetsSecondaryLogo = 'assets/secondary-logo.jpeg';
   static const String assetsWomenSafety = 'assets/womenSafety.jpg';
   static const String assetsWomenSafetyApp = 'assets/womenSafety-app.png';
   static const String debugAndroidManifest = 'assets/android/app/src/debug/AndroidManifest.xml';

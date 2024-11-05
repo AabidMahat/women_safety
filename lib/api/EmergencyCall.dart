@@ -48,7 +48,7 @@ class EmergencyCallApi {
     if (!isCallAnswered) {
       if (phoneNumber != null && phoneNumber!.startsWith('+18')) {
         sendNotification.sendNotification(
-            "Call Notification", "Tap to cancel SOS message (within 10 secs)");
+            "Call Notification", "Tap to cancel SOS message (within 10 secs)",[]);
 
         smsTimer = Timer(Duration(seconds: 10), () {
           sendSMS();

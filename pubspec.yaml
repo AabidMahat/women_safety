@@ -17,6 +17,8 @@ dependencies:
   carousel_slider: ^4.1.1
   webview_flutter: ^3.0.1
   curved_navigation_bar:
+  page_transition:
+  flutter_spinkit:
 
   #  Phone and url
   flutter_phone_direct_caller: ^2.1.1
@@ -77,6 +79,14 @@ dependencies:
 
   #    image
   image_picker:
+
+  #  Hardware devices
+  volume_watcher:
+  hardware_buttons_find_flutter:
+  shake:
+
+  #Design
+  particles_flutter: ^1.0.1
 
 
 dev_dependencies:

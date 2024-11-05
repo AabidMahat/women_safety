@@ -175,7 +175,7 @@ class _LiveLocationState extends State<LiveLocation> {
       }
     }
     _locationController.changeSettings(
-        accuracy: LocationAccuracy.high, distanceFilter: 30, interval: 10000);
+        accuracy: LocationAccuracy.high, distanceFilter: 0, interval: 1000);
     _locationController.onLocationChanged
         .listen((LocationData currentLocation) {
       if (currentLocation.latitude != null &&

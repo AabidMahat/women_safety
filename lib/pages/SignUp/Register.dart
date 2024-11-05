@@ -1,6 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:page_transition/page_transition.dart';
 
 import '../../Database/Database.dart';
 import '../../api/loginApi.dart';
@@ -8,7 +7,6 @@ import '../../consts/AppConts.dart';
 import '../../widgets/Button/ResuableButton.dart';
 import '../../widgets/TextField/TextField.dart';
 import '../LogIn/Login.dart';
-
 
 void main() {
   runApp(MaterialApp(
@@ -45,21 +43,18 @@ class _RegisterState extends State<Register> {
     });
     try {
       final String url = "${MAINURL}/api/v3/user/signUp";
-      User userBody =User(
-        role: "gurdian",
-        name: fullNameText.text,
-        email: emailText.text,
-        phoneNumber: phoneText.text,
-        password: passText.text,
-        confirmPassword: confirmPassText.text
-      );
+      User userBody = User(
+          role: "gurdian",
+          name: fullNameText.text,
+          email: emailText.text,
+          phoneNumber: phoneText.text,
+          password: passText.text,
+          confirmPassword: confirmPassText.text);
       await loginApi.signUp(userBody, context);
 
-     setState(() {
-       isLoading = false;
-     });
-
-
+      setState(() {
+        isLoading = false;
+      });
     } catch (err) {
       print(err);
     } finally {
@@ -99,7 +94,7 @@ class _RegisterState extends State<Register> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: Image.asset(
-                              "assets/womenSafety.jpg",
+                              "assets/secondary-logo.jpeg",
                               width: 241,
                               height: 169,
                             ),
@@ -245,11 +240,11 @@ class _RegisterState extends State<Register> {
                               child: GestureDetector(
                                 onTap: () {
                                   Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => NewLoginPage(),
-                                    ),
-                                  );
+                                      context,
+                                      PageTransition(
+                                          duration: Duration(milliseconds: 500),
+                                          type: PageTransitionType.rightToLeft,
+                                          child: NewLoginPage()));
                                 },
                                 child: Text(
                                   'Already have an account? Login here',

@@ -3,24 +3,23 @@ import 'dart:convert';
 import 'package:fluttertoast/fluttertoast.dart';
 import "package:http/http.dart" as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:women_safety/api/tokenApi.dart';
 
 import '../consts/AppConts.dart';
 
 class SendNotification {
-  Future<void> sendNotification(String title,String message) async {
+  Future<void> sendNotification(
+      String title, String message, List<String> userId) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      final String? firebaseToken = prefs.getString('firebaseToken');
-      print("Notification Token $firebaseToken");
+      List<String> tokens = await TokenApi().getAllTokens(userId);
+      print("Notification Token $tokens");
       final String url = "${MAINURL}/api/v3/notification/sendNotification";
 
-      var TokenBody = {
-        "title": title,
-        "body": message,
-        "fcm_token": firebaseToken
-      };
+      var TokenBody = {"title": title, "body": message, "fcm_tokens": tokens};
 
-      var response = await http.post(Uri.parse(url), body: TokenBody);
+      var response = await http.post(Uri.parse(url),
+          body: json.encode(TokenBody),
+          headers: {"Content-Type": "application/json"});
       print(response.statusCode);
       if (response.statusCode == 200) {
         Fluttertoast.showToast(msg: "Notification Send");
@@ -30,14 +29,14 @@ class SendNotification {
         Fluttertoast.showToast(msg: "Error While Sending Notification");
       }
     } catch (err) {
-      print(err);
+      print("Error while sending Notification $err");
       Fluttertoast.showToast(msg: "Error while sending notification");
     }
   }
 
   Future<void> sendVideoRecordingNotification() async {
     try {
-      final String url = "${MAINURL}/api/v3/notification/triggerVideoRecording";
+       String url = "${MAINURL}/api/v3/notification/triggerVideoRecording";
 
       var TokenBody = {
         "title": "Video Recording",

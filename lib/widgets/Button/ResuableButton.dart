@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class AdvanceButton extends StatelessWidget {
   final bool isLoading; // Whether the button is in loading state
   final VoidCallback? onPressed; // Function to handle button press
   final String buttonText; // Text to display on the button
-  final Color backgroundColor; // Button background color
+  final Color backgroundColor;
+  final Color? textColor;// Button background color
   final IconData?
       prefixIcon; // Icon to display before the button text (optional)
 
@@ -14,6 +16,7 @@ class AdvanceButton extends StatelessWidget {
     required this.onPressed,
     required this.buttonText,
     this.backgroundColor = const Color(0xFF032A04), // Default to green
+    this.textColor = Colors.white,
     this.prefixIcon, // Optional icon
   });
 
@@ -30,13 +33,7 @@ class AdvanceButton extends StatelessWidget {
                   onPressed!();
                 },
           child: isLoading
-              ? SizedBox(
-                  width: 30,
-                  height: 30,
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                  ),
-                )
+              ? Center(child: SpinKitFadingCircle(color: Colors.white,size: 35,))
               : Row(
                   mainAxisSize: MainAxisSize.min, // Align icon and text tightly
                   mainAxisAlignment: MainAxisAlignment.center, // Center items
@@ -52,9 +49,9 @@ class AdvanceButton extends StatelessWidget {
                     ],
                     Text(
                       buttonText,
-                      style: const TextStyle(
+                      style:  TextStyle(
                         fontFamily: 'Plus Jakarta Sans',
-                        color: Colors.white,
+                        color: textColor,
                         fontSize: 18,
                         letterSpacing: 1,
                         fontWeight: FontWeight.w500,

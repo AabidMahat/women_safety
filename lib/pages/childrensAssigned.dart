@@ -1,68 +1,91 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:women_safety/pages/profile/profile.dart';
+import 'package:women_safety/utils/loader.dart';
 import 'package:women_safety/widgets/customAppBar.dart';
+import 'package:women_safety/widgets/noData.dart';
 
+import '../Database/Database.dart';
+import '../api/requestApi.dart';
 import '../widgets/cards/cards.dart';
 
-class ChildrenAssigned extends StatelessWidget {
-  final List<Map<String, String>>? children;
+class ChildrenAssigned extends StatefulWidget {
+  const ChildrenAssigned({super.key});
 
-  const ChildrenAssigned({super.key, required this.children});
+  @override
+  State<ChildrenAssigned> createState() => _ChildrenAssignedState();
+}
+
+class _ChildrenAssignedState extends State<ChildrenAssigned> {
+  List<Map<String, String>> approvedGuardians = [];
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    getUserRequest();
+    super.initState();
+  }
+
+  void getUserRequest() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    // Fetch all user requests
+    List<UserAssignedGuardian> assignedUsers = await RequestApi().getGuardianByUserId();
+
+    // Filter approved guardians only
+    setState(() {
+      approvedGuardians = assignedUsers
+          .where((user) => user.status == "approved") // Filter by status
+          .map((user) => {
+        "phoneNumber": user.phoneNumber,
+        "status": user.status,
+        "name": user.name,
+      })
+          .toList();
+
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: customAppBar("Children Assigned",
-          backgroundColor: Colors.green.shade900, textColor: Colors.white),
-      body: children == null || children!.isEmpty
-          ? Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.child_care, // You can use any icon representing children
-              size: 80,
-              color: Colors.grey.shade400, // A faint color for the icon
+      appBar: customAppBar(
+        "Guardian Assigned",
+        backgroundColor: Colors.green.shade900,
+        textColor: Colors.white,
+        leadingIcon: Icons.arrow_back,
+        onPressed: () {
+          Navigator.pop(
+            context,
+            PageTransition(
+              child: ProfilePage(),
+              type: PageTransitionType.rightToLeft,
+              duration: const Duration(milliseconds: 400),
             ),
-            const SizedBox(height: 20), // Spacing between icon and text
-            Text(
-              'No children assigned',
-              style: TextStyle(
-                fontSize: 22,
-                color: Colors.grey.shade600, // A subtle color for the text
-                fontWeight: FontWeight.w600, // Slightly bold for prominence
-                letterSpacing: 1.0, // Slight letter spacing for readability
-              ),
-              textAlign: TextAlign.center, // Center align text
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Please assign children to view them here.',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey.shade500, // Lighter color for secondary text
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      )
-
+          );
+        },
+      ),
+      body: isLoading
+          ? Loader(context)
+          : approvedGuardians.isEmpty
+          ? noData("No approved guardians available.")
           : ListView.builder(
-              itemCount: children!.length,
-              itemBuilder: (context, index) {
-                var child = children![index];
-                return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: AdvancedCard(
-                    cardTitle: child['name']!,
-                    cardInfo: child['phone']!, // Use correct key 'phone'
-                    cardIcons: Icons.girl,
-                  ),
-                );
-              },
+        itemCount: approvedGuardians.length,
+        itemBuilder: (context, index) {
+          var guardian = approvedGuardians[index];
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
+            child: AdvancedCard(
+              cardTitle: guardian['name']!,
+              cardInfo: guardian['phoneNumber']!,
+              cardIcons: Icons.person,
             ),
+          );
+        },
+      ),
     );
   }
 }

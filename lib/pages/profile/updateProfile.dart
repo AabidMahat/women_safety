@@ -1,7 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:women_safety/api/Permission.dart';
+import 'package:women_safety/api/User.dart';
+import 'package:women_safety/pages/profile/profile.dart';
 import 'package:women_safety/pages/profile/updatePassword.dart';
 import 'package:women_safety/widgets/Button/ResuableButton.dart';
 import 'package:women_safety/widgets/TextField/TextField.dart';
@@ -11,9 +14,9 @@ import '../../Database/Database.dart';
 import '../../api/Guardian.dart';
 
 class UpdateProfile extends StatefulWidget {
-  final Guardian guardian;
+  final UserData user;
 
-  const UpdateProfile({super.key, required this.guardian});
+  const UpdateProfile({super.key, required this.user});
 
   @override
   State<UpdateProfile> createState() => _UpdateProfileState();
@@ -23,20 +26,18 @@ class _UpdateProfileState extends State<UpdateProfile> {
   // Text Controllers
   TextEditingController name = TextEditingController();
   TextEditingController email = TextEditingController();
-  TextEditingController address = TextEditingController();
   TextEditingController password = TextEditingController();
   TextEditingController confirmPassword = TextEditingController();
 
   GuardianApi guardianApi = GuardianApi();
 
   // List of assigned users (for demo purposes)
-  List<Map<String, String>> assignedUsers = [];
+  List<Map<String, String>> assignedGuardians = [];
   List<String> userRemoved = [];
   bool isLoading = false;
   bool isImageStored = false;
   String? avatarUrl;
   PermissionApi permissionApi = PermissionApi();
-
 
   @override
   void initState() {
@@ -46,26 +47,26 @@ class _UpdateProfileState extends State<UpdateProfile> {
 
   void getGuardian() {
     setState(() {
-      name.text = widget.guardian.name;
-      email.text = widget.guardian.email;
-      address.text = widget.guardian.address;
+      avatarUrl = widget.user.avatar;
+      name.text = widget.user.name;
+      email.text = widget.user.email;
 
-      assignedUsers = widget.guardian.userId!.map((child) {
+      assignedGuardians =
+          widget.user.guardians.map<Map<String, String>>((guardian) {
         return {
-          'name': child['name'] ?? '',
-          'phone': child['phoneNumber'] ?? '',
-          'id': child['_id'] ?? ''
+          "name": guardian["name"] ?? '',
+          "phoneNumber": guardian["phoneNumber"] ?? '',
+          "id": guardian["_id"] ?? '',
         };
       }).toList();
     });
-    print("Assigned User $assignedUsers");
   }
 
   void saveImage() async {
     setState(() {
       isImageStored = true;
     });
-    String url = await guardianApi.pickAndUploadImage();
+    String url = await UserApi().pickAndUploadImage();
     setState(() {
       avatarUrl = url;
       isImageStored = false;
@@ -73,21 +74,20 @@ class _UpdateProfileState extends State<UpdateProfile> {
     print(url);
   }
 
-  void updateGuardian() async {
+  void updateUser() async {
     try {
       var updateBody = {
         "avatar": avatarUrl,
         "name": name.text,
         "email": email.text,
-        "address": address.text,
-        "removeUserId": userRemoved,
+        "guardian":assignedGuardians
       };
 
       setState(() {
         isLoading = true;
       });
 
-      await guardianApi.updateGuardian(updateBody, context);
+      await UserApi().updateUser(updateBody, context);
 
       setState(() {
         isLoading = false;
@@ -102,11 +102,17 @@ class _UpdateProfileState extends State<UpdateProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: customAppBar(
-        "Update Profile",
-        backgroundColor: Colors.green.shade900,
-        textColor: Colors.white,
-      ),
+      appBar: customAppBar("Update Profile",
+          backgroundColor: Colors.green.shade900,
+          textColor: Colors.white,
+          leadingIcon: Icons.arrow_back, onPressed: () {
+        Navigator.pop(
+            context,
+            PageTransition(
+                child: ProfilePage(),
+                type: PageTransitionType.rightToLeft,
+                duration: Duration(milliseconds: 400)));
+      }),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -122,11 +128,11 @@ class _UpdateProfileState extends State<UpdateProfile> {
                     backgroundColor: Colors.green.shade100,
                     child: CircleAvatar(
                       radius: 60,
-                      backgroundImage: widget.guardian.avatar == "default.png"
+                      backgroundImage: widget.user.avatar == "default.png"
                           ? const AssetImage(
                               "default.png", // Placeholder avatar
                             )
-                          : NetworkImage(widget.guardian.avatar)
+                          : NetworkImage(widget.user.avatar)
                               as ImageProvider, // Assuming the avatar is a local asset
                     ),
                   ),
@@ -173,22 +179,11 @@ class _UpdateProfileState extends State<UpdateProfile> {
                 size: 20,
               ),
             ),
-            // Address TextField
-            AdvanceTextField(
-              controller: address,
-              type: TextInputType.streetAddress,
-              label: "Address",
-              prefixIcon: Icon(
-                Icons.location_on,
-                color: Colors.green.shade900,
-                size: 20,
-              ),
-            ),
             // Assigned Users Section
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Assigned Users',
+                'Guardian Assigned',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -200,11 +195,11 @@ class _UpdateProfileState extends State<UpdateProfile> {
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: assignedUsers.length,
+              itemCount: assignedGuardians.length,
               itemBuilder: (context, index) {
-                String userName = assignedUsers[index]['name'] ?? '';
-                String phoneNumber = assignedUsers[index]['phone'] ?? '';
-                String id = assignedUsers[index]['id'] ?? '';
+                String userName = assignedGuardians[index]['name'] ?? '';
+                String phoneNumber = assignedGuardians[index]['phoneNumber'] ?? '';
+                String id = assignedGuardians[index]['id'] ?? '';
                 return Dismissible(
                   key: Key(userName + phoneNumber),
                   direction: DismissDirection.endToStart,
@@ -218,7 +213,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                   ),
                   onDismissed: (direction) {
                     setState(() {
-                      assignedUsers.removeAt(index);
+                      assignedGuardians.removeAt(index);
                       userRemoved.add(id);
                     });
                     Fluttertoast.showToast(msg: "${userName} removed");
@@ -233,7 +228,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       contentPadding: const EdgeInsets.symmetric(
                           horizontal: 15, vertical: 2),
                       leading: Icon(Icons.person,
-                          color: Colors.green.shade900, size: 22),
+                          color: Colors.green.shade900, size: 24),
                       title: Text(
                         userName,
                         style: TextStyle(
@@ -246,7 +241,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                         style: TextStyle(
                             color: Colors.grey,
                             fontStyle: FontStyle.italic,
-                            fontSize: 12),
+                            fontSize: 14),
                       ),
                     ),
                   ),
@@ -261,10 +256,12 @@ class _UpdateProfileState extends State<UpdateProfile> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Expanded(
+            SizedBox(
+              height: 65,
+                width: MediaQuery.of(context).size.width/2,
                 child: AdvanceButton(
               onPressed: () {
-                updateGuardian();
+                updateUser();
               },
               buttonText: "Save Profile",
               backgroundColor: Colors.green.shade900,

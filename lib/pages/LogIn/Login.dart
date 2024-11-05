@@ -1,6 +1,7 @@
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:women_safety/home_screen.dart';
 import '../../api/Firebase_api.dart';
 import '../../api/loginApi.dart';
@@ -16,13 +17,8 @@ final navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  await FirebaseApi().initNotification();
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    navigatorKey: navigatorKey,
     home: NewLoginPage(),
     routes: {
       "/home":(context)=>HomeScreen()
@@ -38,13 +34,14 @@ class NewLoginPage extends StatefulWidget {
 }
 
 class _NewLoginPageState extends State<NewLoginPage> {
+  final _formKey = GlobalKey<FormState>(); // Create a GlobalKey for the form
+
   var phoneText = TextEditingController();
   var passText = TextEditingController();
 
   LoginApi loginApi = LoginApi();
 
   bool _isPasswordVisible = false;
-  var userId;
   bool isLoading = false;
   List staffAccount = [];
 
@@ -58,7 +55,11 @@ class _NewLoginPageState extends State<NewLoginPage> {
       setState(() {
         isLoading = true;
       });
+
       await loginApi.login(phoneText.text, passText.text, context);
+
+
+
 
       setState(() {
         isLoading = false;
@@ -101,7 +102,7 @@ class _NewLoginPageState extends State<NewLoginPage> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(20),
                             child: Image.asset(
-                              "assets/womenSafety.jpg",
+                              "assets/secondary-logo.jpeg",
                               color: Colors.transparent,
                               colorBlendMode: BlendMode.multiply,
                               width: 241,
@@ -131,125 +132,142 @@ class _NewLoginPageState extends State<NewLoginPage> {
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Welcome',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Color(0xFF101213),
-                                fontSize: 36,
-                                fontWeight: FontWeight.w600,
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Welcome',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Color(0xFF101213),
+                                  fontSize: 36,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            ),
-                            SizedBox(
-                              height: 25,
-                            ),
-                            AdvanceTextField(
-                              controller: phoneText,
-                              type: TextInputType.number,
-                              label: "Phone",
-                              isPasswordField: false,
-                            ),
-                            AdvanceTextField(
-                              controller: passText,
-                              type: TextInputType.text,
-                              label: "Password",
-                              isPasswordField: true,
-                              isObscuredInitially: !_isPasswordVisible,
-                            ),
-                            AdvanceButton(
-                              isLoading: isLoading,
-                              // Pass the loading state variable
-                              onPressed: () {
-                                login();
-                              },
-                              // Function to execute on press
-                              buttonText: 'Login',
-                              // The text to display on the button
-                              backgroundColor: Colors
-                                  .green.shade900, // Optional: button color
-                            ),
-                            Row(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 12),
-                                  child: TextButton(
-                                    onPressed: () {
-                                      // Navigator.push(
-                                      //     context,
-                                      //     MaterialPageRoute(
-                                      //         builder: (context) =>
-                                      //             ResetPassword()));
-                                    },
-                                    child: Text(
-                                      'Forget password',
-                                      style: TextStyle(
-                                        color: Color(0xFF57636C),
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 12),
-                                  child: TextButton(
-                                    onPressed: () {
-                                      showInputDialogBox(context);
-                                    },
-                                    child: Text(
-                                      'Resend Otp',
-                                      style: TextStyle(
-                                        color: Colors.blue.shade900,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 12),
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => Register()),
-                                  );
+                              SizedBox(
+                                height: 25,
+                              ),
+                              AdvanceTextField(
+                                controller: phoneText,
+                                type: TextInputType.number,
+                                label: "Phone",
+                                isPasswordField: false,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter your phone number';
+                                  }
+                                  if (value.length != 10) {
+                                    return 'Phone number must be 10 digits';
+                                  }
+                                  return null;
                                 },
-                                child: RichText(
-                                  text: TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text: "Don't have an account?  ",
+                              ),
+                              AdvanceTextField(
+                                controller: passText,
+                                type: TextInputType.text,
+                                label: "Password",
+                                isPasswordField: true,
+                                isObscuredInitially: !_isPasswordVisible,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter your password';
+                                  }
+                                  if (value.length <= 8) {
+                                    return 'Password must be at least 8 characters long';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              AdvanceButton(
+                                isLoading: isLoading,
+                                // Pass the loading state variable
+                                onPressed: () {
+                                  login();
+                                },
+                                // Function to execute on press
+                                buttonText: 'Login',
+                                // The text to display on the button
+                                backgroundColor: Colors
+                                    .green.shade900, // Optional: button color
+                              ),
+                              Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 12),
+                                    child: TextButton(
+                                      onPressed: () {
+                                        // Navigator.push(
+                                        //     context,
+                                        //     MaterialPageRoute(
+                                        //         builder: (context) =>
+                                        //             ResetPassword()));
+                                      },
+                                      child: Text(
+                                        'Forget password',
                                         style: TextStyle(
-                                          color: Color(0xFF101213),
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.normal,
+                                          color: Color(0xFF57636C),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
                                         ),
                                       ),
-                                      TextSpan(
-                                        text: 'Sign Up here',
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 12),
+                                    child: TextButton(
+                                      onPressed: () {
+                                        showInputDialogBox(context);
+                                      },
+                                      child: Text(
+                                        'Resend Otp',
                                         style: TextStyle(
-                                          color: Color(0xFF4B39EF),
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
+                                          color: Colors.blue.shade900,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
                                         ),
                                       ),
-                                    ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 12),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(context, PageTransition(duration: Duration(milliseconds: 500), type: PageTransitionType.leftToRight,child: Register()));
+                                  },
+                                  child: RichText(
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: "Don't have an account?  ",
+                                          style: TextStyle(
+                                            color: Color(0xFF101213),
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: 'Sign Up here',
+                                          style: TextStyle(
+                                            color: Color(0xFF4B39EF),
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),

@@ -49,30 +49,64 @@ class FeedbackData {
 }
 
 class UserData {
+  final String avatar;
   final String id;
   final String name;
   final String email;
   final String phoneNumber;
   final String password;
-  final String confirmPasswrd;
+  final String confirmPassword;
+  final String messageTemplate;
+  final List<String> videoUrls;
+  final List<String> audioUrls;
+  final List<Map<String, dynamic>> guardians;
 
   UserData({
+    required this.avatar,
     required this.id,
-    required this.phoneNumber,
     required this.name,
-    required this.password,
     required this.email,
-    required this.confirmPasswrd,
+    required this.phoneNumber,
+    required this.password,
+    required this.confirmPassword,
+    required this.messageTemplate,
+    required this.videoUrls,
+    required this.audioUrls,
+    required this.guardians,
   });
 
+  // Factory constructor to create a UserData instance from JSON
   factory UserData.fromJson(Map<String, dynamic> user) {
     return UserData(
-        id: user['id'],
-        phoneNumber: user['phoneNumber'],
-        name: user['name'],
-        password: user['password'],
-        email: user['email'],
-        confirmPasswrd: user['confirmPassword']);
+      avatar: user['avatar'] ?? 'default.png',
+      id: user['id'] ?? '',
+      name: user['name'] ?? 'Unknown',
+      email: user['email'] ?? '',
+      phoneNumber: user['phoneNumber'] ?? '',
+      password: user['password'] ?? '',
+      confirmPassword: user['confirmPassword'] ?? '',
+      messageTemplate: user['message_template'] ?? '',
+      videoUrls: List<String>.from(user['videoUrl'] ?? []),
+      audioUrls: List<String>.from(user['audioUrl'] ?? []),
+      guardians: List<Map<String, dynamic>>.from(user['guardian'] ?? []),
+    );
+  }
+
+  // Default user instance to use in case of an error or empty data
+  static UserData defaultUser() {
+    return UserData(
+      avatar: "default.png",
+      id: "",
+      name: "Unknown",
+      email: "",
+      phoneNumber: "",
+      password: "",
+      confirmPassword: "",
+      messageTemplate: "",
+      videoUrls: [],
+      audioUrls: [],
+      guardians: [],
+    );
   }
 }
 
@@ -151,11 +185,13 @@ class Guardian {
 class AudioFile {
   final String url;
   final String name;
+  final String uploaderName;
   DateTime uploadTime;
 
   AudioFile({
     required this.url,
     required this.name,
+    required this.uploaderName,
     required this.uploadTime,
   });
 }
@@ -164,6 +200,44 @@ class VideoFile {
   final String url;
   final String name;
   DateTime uploadTime;
+  final String uploaderName;
 
-  VideoFile({required this.url, required this.name, required this.uploadTime});
+  VideoFile(
+      {required this.url,
+      required this.name,
+      required this.uploadTime,
+      required this.uploaderName});
+}
+
+class Request {
+  final String id;
+  final String name;
+  final String phoneNumber;
+
+  Request({required this.id, required this.name, required this.phoneNumber});
+
+  factory Request.fromJson(Map<String, dynamic> json) {
+    return Request(
+      id: json['_id'] as String,
+      name: json['name'] as String,
+      phoneNumber: json['phoneNumber'] as String,
+    );
+  }
+}
+
+class UserAssignedGuardian {
+  final String name;
+  final String phoneNumber;
+  final String status;
+
+  UserAssignedGuardian(
+      {required this.name, required this.phoneNumber, required this.status});
+
+  factory UserAssignedGuardian.fromJson(Map<String, dynamic> json) {
+    return UserAssignedGuardian(
+      name: json['guardians']['name'],
+      phoneNumber: json['guardians']['phoneNumber'],
+      status: json['status'],
+    );
+  }
 }

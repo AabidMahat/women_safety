@@ -37,7 +37,6 @@ class PermissionApi {
         desiredAccuracy: LocationAccuracy.high,
         forceAndroidLocationManager: true,
       );
-      Fluttertoast.showToast(msg: "Location fetched successfully.");
       return _currentPosition;
     } catch (e) {
       Fluttertoast.showToast(msg: "Failed to get current location: $e");

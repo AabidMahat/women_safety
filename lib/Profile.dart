@@ -2,9 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:women_safety/FeedBack/FeedBackMap.dart';
+import 'package:women_safety/api/sendNotification.dart';
 import 'package:women_safety/pages/profile/profile.dart';
-import 'package:women_safety/widgets/sidebar/EmergencyContacts.dart';
+import 'package:women_safety/widgets/sidebar/emergency/EmergencyContacts.dart';
 
 class SideBarWidget extends StatefulWidget {
   final Position? currentPosition;
@@ -23,10 +26,20 @@ class _SideBarWidgetState extends State<SideBarWidget> {
   bool isHandGestureEnabled = false;
 
   bool isLogOut = false;
+  String userPhone = '';
 
   @override
   void initState() {
     super.initState();
+    _loadUserData();
+  }
+
+  _loadUserData() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      userPhone = preferences.getString("phoneNumber") ?? "Phone Number";
+      userId = preferences.getString("userId") ?? "";
+    });
   }
 
   @override
@@ -110,7 +123,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                           ),
                                         ),
                                       ),
-                                       Expanded(
+                                      Expanded(
                                         child: Padding(
                                           padding:
                                               EdgeInsetsDirectional.fromSTEB(
@@ -153,15 +166,27 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                                   padding: EdgeInsetsDirectional
                                                       .fromSTEB(0, 29, 0, 0),
                                                   child: InkWell(
-                                                    onTap: (){
-                                                      Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfilePage()));
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                          context,
+                                                          PageTransition(
+                                                            child:
+                                                                ProfilePage(),
+                                                            type:
+                                                                PageTransitionType
+                                                                    .leftToRight,
+                                                            duration: Duration(
+                                                                milliseconds:
+                                                                    400),
+                                                          ));
                                                     },
                                                     child: Text(
                                                       'Edit Profile',
                                                       style: TextStyle(
                                                         fontFamily:
                                                             'Plus Jakarta Sans',
-                                                        color: Color(0x9AFFFFFF),
+                                                        color:
+                                                            Color(0x9AFFFFFF),
                                                         fontSize: 16,
                                                         letterSpacing: 0,
                                                         fontWeight:
@@ -190,7 +215,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => EmergencyContacts(),
+                                  builder: (context) => EmergencyContacts(userId: userId),
                                 ));
                           },
                           child: Container(
@@ -276,57 +301,49 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                             ),
                           ),
                         ),
-                        Container(
-                          width: double.infinity,
-                          height: 72,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(0),
-                            shape: BoxShape.rectangle,
-                            border: Border.all(
-                              color: Color(0x84BDBDBD),
-                              width: 1,
+                        InkWell(
+                          onTap: () {
+                            SendNotification().sendVideoRecordingNotification();
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            height: 72,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(0),
+                              shape: BoxShape.rectangle,
+                              border: Border.all(
+                                color: Color(0x84BDBDBD),
+                                width: 1,
+                              ),
                             ),
-                          ),
-                          child: Padding(
-                            padding:
-                                EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              children: [
-                                Icon(
-                                  Icons.mobile_friendly_rounded,
-                                  color: Colors.indigo.shade800,
-                                  size: 26,
-                                ),
-                                Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
-                                      12, 0, 0, 0),
-                                  child: Text(
-                                    'Hand Gesture',
-                                    style: TextStyle(
-                                      fontFamily: 'Plus Jakarta Sans',
-                                      color: Colors.indigo.shade800,
-                                      fontSize: 17,
-                                      letterSpacing: 0,
-                                      fontWeight: FontWeight.w500,
+                            child: Padding(
+                              padding:
+                                  EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Icon(
+                                    Icons.slow_motion_video_outlined,
+                                    color: Colors.indigo.shade800,
+                                    size: 26,
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        12, 0, 0, 0),
+                                    child: Text(
+                                      'Video Recording',
+                                      style: TextStyle(
+                                        fontFamily: 'Plus Jakarta Sans',
+                                        color: Colors.indigo.shade800,
+                                        fontSize: 17,
+                                        letterSpacing: 0,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Spacer(),
-                                // Pushes the switch to the end of the row
-                                Switch(
-                                  value: isHandGestureEnabled,
-                                  // this should be a state variable
-                                  onChanged: (bool value) {
-                                    setState(() {
-                                      isHandGestureEnabled =
-                                          value; // update state
-                                    });
-                                  },
-                                  activeColor: Colors.indigo
-                                      .shade800, // Customize the active color
-                                ),
-                              ],
+                                  Spacer(),
+                                ],
+                              ),
                             ),
                           ),
                         ),

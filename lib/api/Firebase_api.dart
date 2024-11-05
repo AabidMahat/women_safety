@@ -7,9 +7,12 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:women_safety/api/EmergencyCall.dart';
+import 'package:women_safety/api/User.dart';
+import 'package:women_safety/api/tokenApi.dart';
 
 import '../Database/Database.dart';
-import '../pages/LogIn/Login.dart';
+import '../main.dart';
+import '../utils/StartVideoRecording.dart';
 
 Future<void> handleBackgroundMessage(RemoteMessage message) async {
   print('Title: ${message.notification?.title}');
@@ -18,6 +21,8 @@ Future<void> handleBackgroundMessage(RemoteMessage message) async {
 }
 
 class FirebaseApi {
+  StartVideoRecording _videoRecordingService = StartVideoRecording();
+
   // Instance of Firebase Messaging
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   EmergencyCallApi emergencyCallApi = EmergencyCallApi();
@@ -40,14 +45,17 @@ class FirebaseApi {
 
   void handleMessage(RemoteMessage? message) {
     if (message == null) return;
-
-    if (message.notification!.title == "Call Notification") {
-      print("Sms*********************");
+    print(message.data);
+    if (message.data['action'] == "startRecording") {
+      print("Navigating to video Player");
+      _videoRecordingService.handleVideoRecordingMessage(message);
+    } else if (message.data['action'] == "audioRecording") {
+      _videoRecordingService.handleAudioRecordingMessage(message);
+    } else if (message.notification!.title == "Call Notification") {
       emergencyCallApi.cancelSMS();
+    } else {
+      navigatorKey.currentState?.pushNamed("/home");
     }
-
-    print(message.notification!.title);
-    navigatorKey.currentState?.pushNamed("/home");
   }
 
   // Function to initialize notifications
@@ -128,19 +136,122 @@ class FirebaseApi {
   }
 
   Future<String> uploadVideo(String videoUrl) async {
-    Reference ref = _storage.ref().child('videos/${DateTime.now()}.mp4');
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? userId = preferences.getString("userId");
+    String? username = preferences.getString("username");
 
-    await ref.putFile(File(videoUrl));
+    Reference userVideoRef = _storage.ref().child('videos/$username');
+
+    final ListResult result = await userVideoRef.listAll();
+
+    List<Map<String, dynamic>> userVideos = [];
+
+    // Collect metadata along with reference
+    for (var ref in result.items) {
+      final FullMetadata metadata = await ref.getMetadata();
+
+      if (metadata.customMetadata?['userId'] == userId) {
+        userVideos.add({
+          'ref': ref,
+          'timeCreated': metadata.timeCreated,
+        });
+      }
+    }
+
+    // Sort the list by timeCreated
+    userVideos.sort((a, b) {
+      return a['timeCreated'].compareTo(b['timeCreated']);
+    });
+
+    // Check if there are more than 3 videos and delete the oldest
+    if (userVideos.length >= 3) {
+      await userVideos.first['ref'].delete();
+      Fluttertoast.showToast(msg: "Deleted oldest video for user $username");
+    }
+
+    // Reference for the new video upload
+    Reference ref = userVideoRef
+        .child('${username}_${DateTime.now().toIso8601String()}.mp4');
+    final SettableMetadata metadata =
+        SettableMetadata(customMetadata: {'userId': userId!});
+
+    await ref.putFile(File(videoUrl), metadata);
 
     String downloadUrl = await ref.getDownloadURL();
-
     return downloadUrl;
   }
 
-  Future<String> uploadAudio(String audioUrl) async {
-    Reference ref = _storage.ref().child("recording/${DateTime.now()}.aac");
+  Future<void> deleteVideo(String fileName) async {
+    try {
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+      String? username = preferences.getString("username");
 
-    await ref.putFile(File(audioUrl));
+      Reference videoRef = _storage.ref().child('videos/$username/$fileName');
+
+      await videoRef.delete();
+
+      Fluttertoast.showToast(msg: "Video deleted successfully");
+    } catch (err) {
+      print("Failed to delete video : $err");
+      Fluttertoast.showToast(msg: "Failed to delete video : $err");
+    }
+  }
+
+  Future<void> deleteAudio(String filename) async {
+    try {
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+      String? username = preferences.getString("username");
+
+      Reference audioRef =
+          _storage.ref().child("recording/$username/$filename");
+
+      await audioRef.delete();
+
+      Fluttertoast.showToast(msg: "Audio deleted successfully");
+    } catch (err) {
+      print("Failed to delete audio : $err");
+      Fluttertoast.showToast(msg: "Failed to delete audio : $err");
+    }
+  }
+
+  Future<String> uploadAudio(String audioUrl) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? userId = preferences.getString("userId");
+    String? username = preferences.getString("username");
+
+    Reference userAudioRef = _storage.ref().child("recording/${username}");
+
+    final ListResult result = await userAudioRef.listAll();
+
+    List<Map<String, dynamic>> userAudios = [];
+
+    for (var ref in result.items) {
+      final FullMetadata metadata = await ref.getMetadata();
+
+      if (metadata.customMetadata?['userId'] == userId) {
+        userAudios.add({
+          'ref': ref,
+          'timeCreated': metadata.timeCreated,
+        });
+      }
+    }
+
+    userAudios.sort((a, b) {
+      return a['timeCreated'].compareTo(b['timeCreated']);
+    });
+
+    if (userAudios.length >= 3) {
+      await userAudios.first['ref'].delete();
+      Fluttertoast.showToast(msg: "Deleted oldest audio for user $username");
+    }
+
+    Reference ref = userAudioRef
+        .child("${username}_${DateTime.now().toIso8601String()}.aac");
+
+    final SettableMetadata metadata =
+        SettableMetadata(customMetadata: {'userId': userId!});
+
+    await ref.putFile(File(audioUrl), metadata);
 
     String downloadUrl = await ref.getDownloadURL();
 
@@ -148,7 +259,10 @@ class FirebaseApi {
   }
 
   Future<List<VideoFile>> fetchVideos() async {
-    final Reference storageRef = FirebaseStorage.instance.ref().child('videos');
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? username = preferences.getString("username");
+    final Reference storageRef =
+        FirebaseStorage.instance.ref().child('videos/$username');
 
     final ListResult result = await storageRef.listAll();
 
@@ -160,18 +274,27 @@ class FirebaseApi {
 
       final FullMetadata metadata = await ref.getMetadata();
 
+      final String userId = metadata.customMetadata?['userId'] ?? ' ';
+
+      final String userName = await UserApi().getUserDetails(userId);
+
       final DateTime uploadTime = metadata.timeCreated ?? DateTime.now();
 
-      videoFile
-          .add(VideoFile(url: downloadUrl, name: name, uploadTime: uploadTime));
+      videoFile.add(VideoFile(
+          url: downloadUrl,
+          name: name,
+          uploadTime: uploadTime,
+          uploaderName: userName));
     }
 
     return videoFile;
   }
 
   Future<List<AudioFile>> fetchAudio() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? username = preferences.getString("username");
     final Reference storageRef =
-        FirebaseStorage.instance.ref().child('recording');
+        FirebaseStorage.instance.ref().child('recording/${username}');
 
     final ListResult result = await storageRef.listAll();
 
@@ -180,13 +303,18 @@ class FirebaseApi {
     for (var ref in result.items) {
       final String downloadUrl = await ref.getDownloadURL();
       final String name = ref.name;
-
       final FullMetadata metadata = await ref.getMetadata();
+      final String userId = metadata.customMetadata?['userId'] ?? "";
+
+      final String userName = await UserApi().getUserDetails(userId);
 
       final DateTime uploadTime = metadata.timeCreated ?? DateTime.now();
 
-      audioFiles
-          .add(AudioFile(url: downloadUrl, name: name, uploadTime: uploadTime));
+      audioFiles.add(AudioFile(
+          url: downloadUrl,
+          name: name,
+          uploadTime: uploadTime,
+          uploaderName: userName));
     }
     return audioFiles;
   }
@@ -203,6 +331,25 @@ class FirebaseApi {
     } catch (err) {
       print("Failed to upload image: $err");
       return "";
+    }
+  }
+
+  Future<void> checkAndUpdateFCMToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? storedToken = prefs.getString("firebaseToken");
+    String? userId = prefs.getString("userId");
+    String? currentToken = await FirebaseMessaging.instance.getToken();
+
+    print({"current": currentToken, "stored": storedToken});
+
+    if (currentToken != null && userId != null) {
+      await prefs.setString('firebaseToken', currentToken);
+
+      await TokenApi().addOrUpdateFCMToken(userId, currentToken);
+
+      print("FCM token saved to backend");
+    } else {
+      print("Failed to get FCM token");
     }
   }
 }

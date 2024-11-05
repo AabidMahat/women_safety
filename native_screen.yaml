@@ -1,6 +1,6 @@
 flutter_native_splash:
   color: "#FFFFFF"
-  image: assets/women_safety.png
+  image: assets/main_logo.png
   android: true
   ios: true
   web: false
@@ -8,7 +8,7 @@ flutter_native_splash:
 
   android_12:
     color: "#FFFFFF"
-    image: assets/women_safety.png
+    image: assets/main_logo.png
     android: true
     ios: true
     web: false
