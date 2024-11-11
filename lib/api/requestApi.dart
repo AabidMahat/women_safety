@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:women_safety/Database/Database.dart';
 import 'package:women_safety/pages/profile/profile.dart';
 import '../consts/AppConts.dart';
+import 'User.dart';
 
 class RequestApi {
   Future<void> createRequest(String userId,
@@ -67,8 +68,15 @@ class RequestApi {
     }
   }
 
+
+
+
   Future<void> updateRequestStatus(List<Map<String,String>> data, BuildContext context) async {
     try {
+
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+      String? userId = preferences.getString("userId");
+
       print("User data $data");
       final String url = "$MAINURL/api/v3/request/updateStatus";
 
@@ -80,6 +88,8 @@ class RequestApi {
       final response = await http.patch(Uri.parse(url),
           body: json.encode(body),
           headers: {"Content-Type": "application/json"});
+
+
 
       if (response.statusCode == 200) {
         Fluttertoast.showToast(msg: "Request Status modified");

@@ -55,6 +55,47 @@ class FeedbackApi {
         return isSubmitted;
       }
     } catch (err) {
+      print("object $err");
+
+      Fluttertoast.showToast(msg: err.toString());
+      return isSubmitted;
+    }
+  }
+
+  Future<bool> updateFeedback(
+      String feedbackId, String comment, String category) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    userId = preferences.getString("userId");
+    bool isSubmitted = false;
+    try {
+      final String url =
+          "${MAINURL}/api/v3/feedback/updateFeedback/$feedbackId";
+
+      var feedbackBody = {
+        "category": category,
+        "comment": comment,
+      };
+
+      var response = await http.patch(
+        Uri.parse(url),
+        body: json.encode(feedbackBody),
+        headers: {"Content-Type": "application/json"},
+      );
+
+      if (response.statusCode == 200) {
+        isSubmitted = true;
+        Fluttertoast.showToast(msg: "Your Feedback has been saved");
+        print(json.decode(response.body));
+        return isSubmitted;
+      } else {
+        Fluttertoast.showToast(msg: "Error while submitting feedback");
+        var responseBody = json.decode(response.body);
+        print(responseBody);
+        return isSubmitted;
+      }
+    } catch (err) {
+      print("object $err");
+
       Fluttertoast.showToast(msg: err.toString());
       return isSubmitted;
     }
@@ -62,8 +103,6 @@ class FeedbackApi {
 
   Future<void> getAllFeedback() async {
     final String url = "${MAINURL}/api/v3/feedback/getAllFeedback";
-    // final String url = "http://10.0.2.2:3000/api/v3/feedback/getAllFeedback";
-    print("called");
     try {
       var response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
@@ -106,6 +145,43 @@ class FeedbackApi {
 
   List<FeedbackData> getFeedBackData() {
     return _feedback;
+  }
+
+  Future<Map<String, dynamic>> checkFeedbackAlreadyPresent(
+      LatLng location) async {
+    Map<String, dynamic> output = {"isPresent": false, "data": {}};
+    try {
+      String url = "$MAINURL/api/v3/feedback/checkFeedbackPresent";
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+      String? userId = preferences.getString("userId");
+
+      var body = {
+        "userId": userId,
+        "location": {
+          "latitude": location.latitude,
+          "longitude": location.longitude
+        }
+      };
+
+      var response = await http.post(
+        Uri.parse(url),
+        body: json.encode(body),
+        headers: {"Content-Type": "application/json"},
+      );
+
+      if (response.statusCode == 400) {
+        Fluttertoast.showToast(msg: "Feedback Already Present");
+
+        var data = json.decode(response.body);
+        output = {"isPresent": true, "data": data['data']};
+      } else {
+        Fluttertoast.showToast(msg: "Please Provide your opinion");
+      }
+      return output;
+    } catch (err) {
+      print("Error while checking feedback $err");
+      return output;
+    }
   }
 
   void closeWebSocket() {

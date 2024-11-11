@@ -6,18 +6,18 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:women_safety/utils/loader.dart';
+import 'package:women_safety/widgets/map/descriptors/HospitalDescriptor.dart';
 
 import '../../consts/AppConts.dart';
-import 'descriptors/MapDescription.dart';
 
-class PoliceStation extends StatefulWidget {
-  const PoliceStation({super.key});
+class HospitalMap extends StatefulWidget {
+  const HospitalMap({super.key});
 
   @override
-  State<PoliceStation> createState() => _PoliceStationState();
+  State<HospitalMap> createState() => _HospitalMapState();
 }
 
-class _PoliceStationState extends State<PoliceStation> {
+class _HospitalMapState extends State<HospitalMap> {
   BitmapDescriptor? policeIcon;
   GoogleMapController? _mapController;
   Position? _currentPosition;
@@ -37,13 +37,11 @@ class _PoliceStationState extends State<PoliceStation> {
   void setUpIcon() {
     BitmapDescriptor.fromAssetImage(
       ImageConfiguration(),
-      'assets/markers/policeMarker.png',
+      'assets/markers/hospital.png',
     ).then((icon) {
       setState(() {
         policeIcon = icon;
       });
-      print("______________________");
-      print(policeIcon.toString());
     }).catchError((e) {
       print("Error loading icon: $e");
       Fluttertoast.showToast(msg: "Failed to load police icon.");
@@ -76,7 +74,7 @@ class _PoliceStationState extends State<PoliceStation> {
       });
 
       if (_currentPosition != null) {
-        _getNearbyPoliceStations();
+        _getNearbyBusStations();
       } else {
         Fluttertoast.showToast(msg: "Failed to get current location.");
       }
@@ -100,7 +98,7 @@ class _PoliceStationState extends State<PoliceStation> {
     }
   }
 
-  Future<void> _getNearbyPoliceStations() async {
+  Future<void> _getNearbyBusStations() async {
     final apiKey = GOOGLE_API_KEY;
     final radius = 5000;
 
@@ -110,7 +108,7 @@ class _PoliceStationState extends State<PoliceStation> {
         'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
 
     final url =
-        '$baseURl?location=${_currentPosition!.latitude},${_currentPosition!.longitude}&radius=$radius&type=police&key=$apiKey';
+        '$baseURl?location=${_currentPosition!.latitude},${_currentPosition!.longitude}&radius=$radius&type=hospital&key=$apiKey';
 
     final response = await http.get(Uri.parse(url));
 
@@ -122,7 +120,7 @@ class _PoliceStationState extends State<PoliceStation> {
       if (data['status'] == 'OK' && policeIcon != null) {
         for (var place in data['results']) {
           // Fetch and display the details including the phone number
-          _getPoliceStationDetails(place);
+          _getBusStationDetails(place);
         }
       } else {
         Fluttertoast.showToast(msg: "No police stations found nearby.");
@@ -132,7 +130,7 @@ class _PoliceStationState extends State<PoliceStation> {
     }
   }
 
-  Future<void> _getPoliceStationDetails(Map<String, dynamic> place) async {
+  Future<void> _getBusStationDetails(Map<String, dynamic> place) async {
     final apiKey = GOOGLE_API_KEY;
     final placeId = place['place_id'];
     final url =
@@ -174,7 +172,7 @@ class _PoliceStationState extends State<PoliceStation> {
               showModalBottomSheet(
                   context: context,
                   builder: (BuildContext context) {
-                    return PlaceDescription(
+                    return HospitalDescriptor(
                       stationDetails: result,
                       initialPosition: _initialPosition!,
                       finalPosition: _finalPosition!,

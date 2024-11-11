@@ -32,6 +32,8 @@ class LoginApi {
         preferences.setString("userId", body['data']["_id"]);
         preferences.setString("phoneNumber", body['data']['phoneNumber']);
         preferences.setString("username", body['data']['name']);
+        preferences.setString("avatar", body['data']['avatar']);
+        preferences.setString("message", body['data']['message_template']);
 
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => HomeScreen()));

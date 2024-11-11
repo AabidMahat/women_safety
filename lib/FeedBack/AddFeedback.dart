@@ -3,11 +3,11 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:women_safety/FeedBack/FeedBackMap.dart';
 import 'package:women_safety/api/FeedbackApi.dart';
 import 'package:women_safety/api/mapApi.dart';
+import 'package:women_safety/widgets/TextField/TestArea.dart';
 
 import '../widgets/Button/ResuableButton.dart';
 import '../widgets/TextField/TextField.dart';
 import '../widgets/customAppBar.dart';
-
 
 class AddFeedback extends StatefulWidget {
   final LatLng position;
@@ -44,7 +44,10 @@ class _AddFeedbackState extends State<AddFeedback> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: customAppBar("Add Feedback",onPressed: (){},),
+      appBar: customAppBar(
+        "Add Feedback",
+        onPressed: () {},
+      ),
       body: SingleChildScrollView(
           child: Container(
         margin: EdgeInsets.only(top: 15),
@@ -57,12 +60,7 @@ class _AddFeedbackState extends State<AddFeedback> {
               label: "Place",
               readOnly: true,
             ),
-            AdvanceTextField(
-              controller: review,
-              type: TextInputType.text,
-              label: "Review",
-              prefixIcon: Icon(Icons.location_on),
-            ),
+            AdvanceTextArea(controller: review, label: "Review"),
             DropdownButtonFormField<String>(
               decoration: InputDecoration(
                 labelText: "Type",
@@ -105,7 +103,7 @@ class _AddFeedbackState extends State<AddFeedback> {
                 await feedbackApi.createFeedback(
                     widget.position, review.text, category!);
 
-                Navigator.pop(
+                Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => FeedbackScreen(

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:women_safety/widgets/map/BusMap.dart';
 
 class BusStationCard extends StatelessWidget {
-  final Function? onMapFunction;
-  const BusStationCard({super.key, this.onMapFunction});
+
+  const BusStationCard({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,12 +15,18 @@ class BusStationCard extends StatelessWidget {
 
           InkWell(
             onTap: (){
-              onMapFunction!("bus stations near me");
+              Navigator.push(
+                  context,
+                  PageTransition(
+                      child: BusStation(),
+                      type: PageTransitionType.leftToRight,
+                      duration: Duration(milliseconds: 400)));
             },
             child: Card(
               elevation: 3,
+              surfaceTintColor: Colors.white,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)
+                  borderRadius: BorderRadius.circular(24)
               ),
               child: Container(
                 height: 50,
@@ -32,8 +40,14 @@ class BusStationCard extends StatelessWidget {
               ),
             ),
           ),
-          Text("Bus Stations")
-
+          Text(
+            "Bus Stations",
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87, // Slightly softer than pure black
+            ),
+          )
         ],
       ),
     );

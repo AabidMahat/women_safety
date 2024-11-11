@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:women_safety/Database/Database.dart';
@@ -126,7 +125,7 @@ class VideoCard extends StatelessWidget {
       elevation: 5,
       margin: const EdgeInsets.symmetric(vertical: 10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Stack(
+      child: Column(
         children: [
           InkWell(
             onTap: () {
@@ -164,50 +163,62 @@ class VideoCard extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 6),
-                  Text(
-                    'Date: ${DateFormat('dd-MMM-yyyy').format(videoFile.uploadTime)}',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey.shade600,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Date: ${DateFormat('dd-MMM-yyyy').format(videoFile.uploadTime)}',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          // Download Button
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.blue,
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                            child: IconButton(
+                              icon: Icon(Icons.download, color: Colors.white),
+                              onPressed: onDownload,
+                              tooltip: 'Download',
+                            ),
+                          ),
+                          SizedBox(width: 10),
+
+                          // Delete Button
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                            child: IconButton(
+                              icon: Icon(Icons.delete, color: Colors.white),
+                              onPressed: onDelete,
+                              tooltip: 'Delete',
+                            ),
+                          ),
+                        ],
+                      ),
+
+                    ],
                   ),
                 ],
               ),
             ),
           ),
-          Positioned(
-            right: 8,
-            top: 8,
-            child: Row(
-              children: [
-                // Download Button
-                Container(
-
-                  child: IconButton(
-                    icon: Icon(Icons.download, color: Colors.blue),
-                    onPressed: onDownload,
-                    tooltip: 'Download',
-                  ),
-                ),
-
-                // Delete Button
-                Container(
-
-                  child: IconButton(
-                    icon: Icon(Icons.delete, color: Colors.red),
-                    onPressed: onDelete,
-                    tooltip: 'Delete',
-                  ),
-                ),
-              ],
-            ),
-          )
-
         ],
       ),
     );
   }
 }
+
 
 class VideoThumbnailWidget extends StatelessWidget {
   final String videoUrl;

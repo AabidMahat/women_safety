@@ -53,6 +53,10 @@ class Assets {
   static const String gradleWrapperGradleWrapper = 'assets/android/gradle/wrapper/gradle-wrapper.properties';
   static const String gurdianAppMainActivity = 'assets/android/app/src/main/kotlin/com/example/gurdian_app/MainActivity.kt';
   static const String mainAndroidManifest = 'assets/android/app/src/main/AndroidManifest.xml';
+  static const String markersBus = 'assets/markers/bus.png';
+  static const String markersHospital = 'assets/markers/hospital.png';
+  static const String markersPharmacy = 'assets/markers/pharmacy.png';
+  static const String markersPoliceMarker = 'assets/markers/policeMarker.png';
   static const String mipmapHdpiIcLauncher = 'assets/android/app/src/main/res/mipmap-hdpi/ic_launcher.png';
   static const String mipmapHdpiLauncherIcon = 'assets/android/app/src/main/res/mipmap-hdpi/launcher_icon.png';
   static const String mipmapMdpiIcLauncher = 'assets/android/app/src/main/res/mipmap-mdpi/ic_launcher.png';

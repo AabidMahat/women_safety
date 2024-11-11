@@ -91,7 +91,7 @@ class FirebaseApi {
             _androidChannel.id,
             _androidChannel.name,
             channelDescription: _androidChannel.description,
-            icon: '@drawable/women_safety',
+            icon: '@drawable/img',
           ),
         ),
         payload: jsonEncode(message.toMap()),

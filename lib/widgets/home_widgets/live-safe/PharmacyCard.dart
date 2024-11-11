@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:women_safety/widgets/map/pharmacyMap.dart';
 
 class PharmacyCard extends StatelessWidget {
-  final Function? onMapFunction;
-  const PharmacyCard({super.key, this.onMapFunction});
+
+  const PharmacyCard({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,12 +15,18 @@ class PharmacyCard extends StatelessWidget {
 
           InkWell(
             onTap: (){
-              onMapFunction!("pharmacies near me");
+              Navigator.push(
+                  context,
+                  PageTransition(
+                      child: Pharmacy(),
+                      type: PageTransitionType.leftToRight,
+                      duration: Duration(milliseconds: 400)));
             },
             child: Card(
+              surfaceTintColor: Colors.white,
               elevation: 3,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)
+                  borderRadius: BorderRadius.circular(24)
               ),
               child: Container(
                 height: 50,
@@ -32,7 +40,14 @@ class PharmacyCard extends StatelessWidget {
               ),
             ),
           ),
-          Text("Pharmacy")
+          Text(
+            "Pharmacy",
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87, // Slightly softer than pure black
+            ),
+          )
 
         ],
       ),

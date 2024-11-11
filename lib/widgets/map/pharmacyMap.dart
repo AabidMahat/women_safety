@@ -8,16 +8,16 @@ import 'package:http/http.dart' as http;
 import 'package:women_safety/utils/loader.dart';
 
 import '../../consts/AppConts.dart';
-import 'descriptors/MapDescription.dart';
+import 'descriptors/PharmacyDescriptor.dart';
 
-class PoliceStation extends StatefulWidget {
-  const PoliceStation({super.key});
+class Pharmacy extends StatefulWidget {
+  const Pharmacy({super.key});
 
   @override
-  State<PoliceStation> createState() => _PoliceStationState();
+  State<Pharmacy> createState() => _PharmacyState();
 }
 
-class _PoliceStationState extends State<PoliceStation> {
+class _PharmacyState extends State<Pharmacy> {
   BitmapDescriptor? policeIcon;
   GoogleMapController? _mapController;
   Position? _currentPosition;
@@ -37,13 +37,12 @@ class _PoliceStationState extends State<PoliceStation> {
   void setUpIcon() {
     BitmapDescriptor.fromAssetImage(
       ImageConfiguration(),
-      'assets/markers/policeMarker.png',
+      'assets/markers/pharmacy.png',
     ).then((icon) {
       setState(() {
+        print(icon);
         policeIcon = icon;
       });
-      print("______________________");
-      print(policeIcon.toString());
     }).catchError((e) {
       print("Error loading icon: $e");
       Fluttertoast.showToast(msg: "Failed to load police icon.");
@@ -76,7 +75,7 @@ class _PoliceStationState extends State<PoliceStation> {
       });
 
       if (_currentPosition != null) {
-        _getNearbyPoliceStations();
+        _getNearbyBusStations();
       } else {
         Fluttertoast.showToast(msg: "Failed to get current location.");
       }
@@ -100,21 +99,19 @@ class _PoliceStationState extends State<PoliceStation> {
     }
   }
 
-  Future<void> _getNearbyPoliceStations() async {
+  Future<void> _getNearbyBusStations() async {
     final apiKey = GOOGLE_API_KEY;
-    final radius = 5000;
+    final radius = 3000;
 
-    print(apiKey);
 
     final baseURl =
         'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
 
     final url =
-        '$baseURl?location=${_currentPosition!.latitude},${_currentPosition!.longitude}&radius=$radius&type=police&key=$apiKey';
+        '$baseURl?location=${_currentPosition!.latitude},${_currentPosition!.longitude}&radius=$radius&type=pharmacy&key=$apiKey';
 
     final response = await http.get(Uri.parse(url));
 
-    print("Response ${json.decode(response.body)}");
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -122,7 +119,7 @@ class _PoliceStationState extends State<PoliceStation> {
       if (data['status'] == 'OK' && policeIcon != null) {
         for (var place in data['results']) {
           // Fetch and display the details including the phone number
-          _getPoliceStationDetails(place);
+          _getBusStationDetails(place);
         }
       } else {
         Fluttertoast.showToast(msg: "No police stations found nearby.");
@@ -132,19 +129,17 @@ class _PoliceStationState extends State<PoliceStation> {
     }
   }
 
-  Future<void> _getPoliceStationDetails(Map<String, dynamic> place) async {
+  Future<void> _getBusStationDetails(Map<String, dynamic> place) async {
     final apiKey = GOOGLE_API_KEY;
     final placeId = place['place_id'];
     final url =
         'https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$apiKey';
 
-    print(url);
 
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      print(data);
       if (data['status'] == 'OK') {
         final result = data['result'];
 
@@ -159,8 +154,9 @@ class _PoliceStationState extends State<PoliceStation> {
               place['geometry']['location']['lng'],
             ),
             icon: policeIcon!,
+            visible: true,
+            infoWindow: InfoWindow(title: result['name']),
             onTap: () {
-              print(result);
               _getRouteToMarker(LatLng(
                 place['geometry']['location']['lat'],
                 place['geometry']['location']['lng'],
@@ -174,7 +170,7 @@ class _PoliceStationState extends State<PoliceStation> {
               showModalBottomSheet(
                   context: context,
                   builder: (BuildContext context) {
-                    return PlaceDescription(
+                    return PharmacyDescriptor(
                       stationDetails: result,
                       initialPosition: _initialPosition!,
                       finalPosition: _finalPosition!,

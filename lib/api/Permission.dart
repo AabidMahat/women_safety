@@ -12,7 +12,8 @@ class PermissionApi {
     // Check if location services are enabled
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      Fluttertoast.showToast(msg: "Location services are disabled.");
+      Fluttertoast.showToast(
+          msg: "Location services are disabled. Please turn on location");
       return null;
     }
 
@@ -25,9 +26,11 @@ class PermissionApi {
         return null;
       }
     }
-
     if (permission == LocationPermission.deniedForever) {
-      Fluttertoast.showToast(msg: "Location permission is denied forever.");
+      Fluttertoast.showToast(
+          msg:
+              "Location permission is denied forever. Please enable it in settings.");
+      await Geolocator.openAppSettings();
       return null;
     }
 
@@ -50,25 +53,25 @@ class PermissionApi {
       Fluttertoast.showToast(msg: 'Phone state permission is not granted');
     }
   }
-  Future<void> requestSmsPermission()async{
+
+  Future<void> requestSmsPermission() async {
     final status = await Permission.sms.request();
-    if(!status.isGranted){
+    if (!status.isGranted) {
       Fluttertoast.showToast(msg: 'Sms permission is not granted');
     }
   }
 
-  Future<void> requestStoragePermission()async{
+  Future<void> requestStoragePermission() async {
     final status = await Permission.storage.request();
-    if(!status.isGranted){
+    if (!status.isGranted) {
       Fluttertoast.showToast(msg: 'Storage permission is not granted');
-
     }
   }
-  Future<void> requestCameraPermission()async{
-    final status = await Permission.camera.request();
-    if(!status.isGranted){
-      Fluttertoast.showToast(msg: 'Camera permission is not granted');
 
+  Future<void> requestCameraPermission() async {
+    final status = await Permission.camera.request();
+    if (!status.isGranted) {
+      Fluttertoast.showToast(msg: 'Camera permission is not granted');
     }
   }
 }

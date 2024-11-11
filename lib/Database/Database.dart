@@ -1,13 +1,15 @@
 class FeedbackData {
   final String id;
-  final Map<String, double> location;
+  final Map<String, double> location;// Store coordinates as [longitude, latitude]
   final String category;
   final String comments;
   final DateTime timestamp;
   final String? userName;
   final String? userRole;
+  final String ? userAvatar;
   final String? guardianName;
   final String? guardianRole;
+  final String? guardianAvatar;
 
   FeedbackData({
     required this.id,
@@ -17,8 +19,10 @@ class FeedbackData {
     required this.timestamp,
     this.userName,
     this.userRole,
+    this.userAvatar,
     this.guardianName,
     this.guardianRole,
+    this.guardianAvatar
   });
 
   factory FeedbackData.fromJson(Map<String, dynamic> feedback) {
@@ -27,26 +31,26 @@ class FeedbackData {
       location: {
         'latitude': feedback['location']['latitude'].toDouble(),
         'longitude': feedback['location']['longitude'].toDouble(),
-      },
+      }, // Parse the coordinates array
       category: feedback['category'],
       comments: feedback['comment'],
-      timestamp:
-          DateTime.tryParse(feedback['timestamp'] ?? '') ?? DateTime.now(),
+      timestamp: DateTime.tryParse(feedback['timestamp'] ?? '') ?? DateTime.now(),
 
       // Handle the case where userId may not be present
       userName: feedback['userId'] != null ? feedback['userId']['name'] : null,
       userRole: feedback['userId'] != null ? feedback['userId']['role'] : null,
+      userAvatar: feedback['userId'] != null ? feedback['userId']['avatar'] : null,
+
 
       // Handle the case where guardianId may not be present
-      guardianName: feedback['guardianId'] != null
-          ? feedback['guardianId']['name']
-          : null,
-      guardianRole: feedback['guardianId'] != null
-          ? feedback['guardianId']['role']
-          : null,
+      guardianName: feedback['guardianId'] != null ? feedback['guardianId']['name'] : null,
+      guardianRole: feedback['guardianId'] != null ? feedback['guardianId']['role'] : null,
+      guardianAvatar: feedback['guardianId'] != null ? feedback['guardianId']['avatar'] : null,
+
     );
   }
 }
+
 
 class UserData {
   final String avatar;

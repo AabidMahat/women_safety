@@ -2,15 +2,14 @@ import 'dart:convert';
 
 import 'package:background_sms/background_sms.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:women_safety/api/Permission.dart';
 
 Future<void> sendSMS() async {
   try {
-    PermissionApi permissionApi = PermissionApi();
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String phoneNumber = preferences.getString("phoneNumber")!;
+
+    List<String> numbers = ['7559153594','7722091840'];
 
     String? position = preferences.getString("userLocation");
 
@@ -27,16 +26,21 @@ Future<void> sendSMS() async {
     final detailedMessage =
         "I'm in trouble and need help! Here is my current location: $mapsLink. ";
 
-    await BackgroundSms.sendMessage(
-      phoneNumber: phoneNumber,
-      message: detailedMessage,
-    ).then((SmsStatus status) {
-      if (status == SmsStatus.sent) {
-        Fluttertoast.showToast(msg: "Message Sent");
-      } else {
-        Fluttertoast.showToast(msg: "Failed to send SMS");
-      }
-    });
+
+    for(String number in numbers){
+      await BackgroundSms.sendMessage(
+        phoneNumber: number,
+        message: detailedMessage,
+      ).then((SmsStatus status) {
+        if (status == SmsStatus.sent) {
+          Fluttertoast.showToast(msg: "Message Sent");
+        } else {
+          Fluttertoast.showToast(msg: "Failed to send SMS");
+        }
+      });
+    }
+
+
   } catch (e) {
     print(e);
     Fluttertoast.showToast(msg: 'Error: ${e.toString()}');
