@@ -92,11 +92,11 @@ void showConfirmationModal(BuildContext context, String phoneNumber) {
                     ElevatedButton(
                       onPressed: () {
                         // Call the API to initiate the first call
-                        // emergencyCallApi.makeCall(phoneNumber);
+                        emergencyCallApi.makeCall(phoneNumber);
 
                         isConfirmed = true;
 
-                        // startCallScheduler(context, phoneNumber);
+                        startCallScheduler(context, phoneNumber);
 
                         // Close the modal
                         Navigator.pop(context);

@@ -51,7 +51,6 @@ class _SideBarWidgetState extends State<SideBarWidget> {
   }
 
 
-
   void logOut() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.clear();
@@ -69,7 +68,9 @@ class _SideBarWidgetState extends State<SideBarWidget> {
     print("Sidebar $staffAccess");
     return Scaffold(
       body: Container(
-          width: MediaQuery.sizeOf(context).width,
+          width: MediaQuery
+              .sizeOf(context)
+              .width,
           child: Drawer(
               backgroundColor: Colors.white,
               surfaceTintColor: Colors.white,
@@ -77,7 +78,9 @@ class _SideBarWidgetState extends State<SideBarWidget> {
               child: Align(
                 alignment: AlignmentDirectional(-1, -1),
                 child: Container(
-                  width: MediaQuery.sizeOf(context).width,
+                  width: MediaQuery
+                      .sizeOf(context)
+                      .width,
                   height: double.infinity,
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -123,46 +126,49 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                   child: Row(
                                     mainAxisSize: MainAxisSize.max,
                                     children: [
-                                    Container(
-                                    width: 95,
-                                    height: 100,
-                                    decoration: BoxDecoration(
-                                      color: Color(0x4D9489F5),
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                        color: Colors.green.shade900,
-                                        width: 2,
+                                      Container(
+                                        width: 95,
+                                        height: 100,
+                                        decoration: BoxDecoration(
+                                          color: Color(0x4D9489F5),
+                                          borderRadius: BorderRadius.circular(
+                                              12),
+                                          border: Border.all(
+                                            color: Colors.green.shade900,
+                                            width: 2,
+                                          ),
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                              8),
+                                          child: avatar == null ||
+                                              avatar == "default.png"
+                                              ? Image.network(
+                                            'https://images.unsplash.com/photo-1624561172888-ac93c696e10c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NjJ8fHVzZXJzfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=900&q=60',
+                                            fit: BoxFit.cover,
+                                          )
+                                              : Image.network(
+                                            avatar,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: avatar == null || avatar == "default.png"
-                                          ? Image.network(
-                                        'https://images.unsplash.com/photo-1624561172888-ac93c696e10c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NjJ8fHVzZXJzfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=900&q=60',
-                                        fit: BoxFit.cover,
-                                      )
-                                          : Image.network(
-                                        avatar,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
 
-                              Expanded(
+                                      Expanded(
                                         child: Padding(
                                           padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  12, 0, 0, 0),
+                                          EdgeInsetsDirectional.fromSTEB(
+                                              12, 0, 0, 0),
                                           child: Column(
                                             mainAxisSize: MainAxisSize.max,
                                             crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 '$name',
                                                 style: TextStyle(
                                                   fontFamily:
-                                                      'Plus Jakarta Sans',
+                                                  'Plus Jakarta Sans',
                                                   color: Colors.white,
                                                   fontSize: 18,
                                                   letterSpacing: 0,
@@ -176,7 +182,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                                   '$userPhone',
                                                   style: TextStyle(
                                                     fontFamily:
-                                                        'Plus Jakarta Sans',
+                                                    'Plus Jakarta Sans',
                                                     color: Color(0x9AFFFFFF),
                                                     fontSize: 14,
                                                     letterSpacing: 0,
@@ -186,7 +192,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                               ),
                                               Align(
                                                 alignment:
-                                                    AlignmentDirectional(-1, 0),
+                                                AlignmentDirectional(-1, 0),
                                                 child: Padding(
                                                   padding: EdgeInsetsDirectional
                                                       .fromSTEB(0, 29, 0, 0),
@@ -196,26 +202,26 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                                           context,
                                                           PageTransition(
                                                             child:
-                                                                ProfilePage(),
+                                                            ProfilePage(),
                                                             type:
-                                                                PageTransitionType
-                                                                    .leftToRight,
+                                                            PageTransitionType
+                                                                .leftToRight,
                                                             duration: Duration(
                                                                 milliseconds:
-                                                                    400),
+                                                                400),
                                                           ));
                                                     },
                                                     child: Text(
                                                       'Edit Profile',
                                                       style: TextStyle(
                                                         fontFamily:
-                                                            'Plus Jakarta Sans',
+                                                        'Plus Jakarta Sans',
                                                         color:
-                                                            Color(0x9AFFFFFF),
+                                                        Color(0x9AFFFFFF),
                                                         fontSize: 16,
                                                         letterSpacing: 0,
                                                         fontWeight:
-                                                            FontWeight.w500,
+                                                        FontWeight.w500,
                                                       ),
                                                     ),
                                                   ),
@@ -245,7 +251,10 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                 ));
                           },
                           child: Container(
-                            width: MediaQuery.of(context).size.width,
+                            width: MediaQuery
+                                .of(context)
+                                .size
+                                .width,
                             height: 72,
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -258,7 +267,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                             ),
                             child: Padding(
                               padding:
-                                  EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
+                              EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
                               child: Row(
                                 mainAxisSize: MainAxisSize.max,
                                 children: [
@@ -287,7 +296,10 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                           ),
                         ),
                         Container(
-                          width: MediaQuery.of(context).size.width,
+                          width: MediaQuery
+                              .of(context)
+                              .size
+                              .width,
                           height: 72,
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -300,7 +312,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                           ),
                           child: Padding(
                             padding:
-                                EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
+                            EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
@@ -344,7 +356,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                             ),
                             child: Padding(
                               padding:
-                                  EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
+                              EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
                               child: Row(
                                 mainAxisSize: MainAxisSize.max,
                                 children: [
@@ -374,7 +386,10 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                           ),
                         ),
                         Container(
-                          width: MediaQuery.of(context).size.width,
+                          width: MediaQuery
+                              .of(context)
+                              .size
+                              .width,
                           height: 72,
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -387,7 +402,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                           ),
                           child: Padding(
                             padding:
-                                EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
+                            EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
@@ -417,19 +432,23 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                         InkWell(
                           onTap: widget.currentPosition != null
                               ? () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => FeedbackScreen(
-                                              currentPosition: LatLng(
-                                                  widget.currentPosition!
-                                                      .latitude,
-                                                  widget.currentPosition!
-                                                      .longitude))));
-                                }
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        FeedbackScreen(
+                                            currentPosition: LatLng(
+                                                widget.currentPosition!
+                                                    .latitude,
+                                                widget.currentPosition!
+                                                    .longitude))));
+                          }
                               : null,
                           child: Container(
-                            width: MediaQuery.of(context).size.width,
+                            width: MediaQuery
+                                .of(context)
+                                .size
+                                .width,
                             height: 72,
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -442,7 +461,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                             ),
                             child: Padding(
                               padding:
-                                  EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
+                              EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
                               child: Row(
                                 mainAxisSize: MainAxisSize.max,
                                 children: [
@@ -479,44 +498,55 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                     type: PageTransitionType.leftToRight,
                                     duration: Duration(milliseconds: 400)));
                           },
-                          child: Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: 72,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(0),
-                              shape: BoxShape.rectangle,
-                              border: Border.all(
-                                color: Color(0x84BDBDBD),
-                                width: 1,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(context, PageTransition(
+                                  child: MessageTemplate(),
+                                  type: PageTransitionType.leftToRight,
+                                  duration: Duration(milliseconds: 400)));
+                            },
+                            child: Container(
+                              width: MediaQuery
+                                  .of(context)
+                                  .size
+                                  .width,
+                              height: 72,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(0),
+                                shape: BoxShape.rectangle,
+                                border: Border.all(
+                                  color: Color(0x84BDBDBD),
+                                  width: 1,
+                                ),
                               ),
-                            ),
-                            child: Padding(
-                              padding:
-                                  EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Icon(
-                                    Icons.settings,
-                                    color: Colors.indigo.shade800,
-                                    size: 28,
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        12, 0, 0, 0),
-                                    child: Text(
-                                      'Settings',
-                                      style: TextStyle(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: Colors.indigo.shade800,
-                                        fontSize: 17,
-                                        letterSpacing: 0,
-                                        fontWeight: FontWeight.w500,
+                              child: Padding(
+                                padding:
+                                EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    Icon(
+                                      Icons.settings,
+                                      color: Colors.indigo.shade800,
+                                      size: 28,
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                          12, 0, 0, 0),
+                                      child: Text(
+                                        'Settings',
+                                        style: TextStyle(
+                                          fontFamily: 'Plus Jakarta Sans',
+                                          color: Colors.indigo.shade800,
+                                          fontSize: 17,
+                                          letterSpacing: 0,
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -524,7 +554,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                         Expanded(
                           child: Container(
                             padding:
-                                EdgeInsetsDirectional.fromSTEB(16, 0, 16, 16),
+                            EdgeInsetsDirectional.fromSTEB(16, 0, 16, 16),
                             child: Column(
                               mainAxisSize: MainAxisSize.max,
                               mainAxisAlignment: MainAxisAlignment.end,
@@ -539,8 +569,11 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                     children: [
                                       Container(
                                         width:
-                                            MediaQuery.of(context).size.width *
-                                                0.6,
+                                        MediaQuery
+                                            .of(context)
+                                            .size
+                                            .width *
+                                            0.6,
                                         child: Align(
                                           alignment: AlignmentDirectional(0, 0),
                                           child: ElevatedButton(
@@ -548,7 +581,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                               padding: EdgeInsets.zero,
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
-                                                    BorderRadius.circular(24),
+                                                BorderRadius.circular(24),
                                               ),
                                               primary: Colors.indigo.shade800,
                                             ),
@@ -560,7 +593,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                                   .fromSTEB(24, 0, 24, 0),
                                               child: Row(
                                                 mainAxisAlignment:
-                                                    MainAxisAlignment.center,
+                                                MainAxisAlignment.center,
                                                 children: [
                                                   // FaIcon(
                                                   //   Icons.logout_sharp,
@@ -572,11 +605,11 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                                     'Log Out',
                                                     style: TextStyle(
                                                       fontFamily:
-                                                          'Plus Jakarta Sans',
+                                                      'Plus Jakarta Sans',
                                                       color: Colors.white,
                                                       fontSize: 20,
                                                       fontWeight:
-                                                          FontWeight.w500,
+                                                      FontWeight.w500,
                                                     ),
                                                   ),
                                                 ],

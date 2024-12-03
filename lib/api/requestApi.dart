@@ -68,28 +68,51 @@ class RequestApi {
     }
   }
 
+  Future<void> deleteRequest(
+      List<Map<String, String>> data, BuildContext context) async {
+    final String url = "$MAINURL/api/v3/request/deleteRequest";
 
 
+    print(data);
 
-  Future<void> updateRequestStatus(List<Map<String,String>> data, BuildContext context) async {
     try {
+      var body = {"updates": data};
 
+      final response = await http.delete(Uri.parse(url),
+          body: json.encode(body),
+          headers: {"Content-Type": "application/json"});
+
+      if (response.statusCode == 200) {
+        Fluttertoast.showToast(msg: "Requests removed");
+        Navigator.push(
+            context,
+            PageTransition(
+                child: ProfilePage(),
+                type: PageTransitionType.leftToRight,
+                duration: Duration(milliseconds: 400)));
+      } else {
+        var output = json.decode(response.body);
+        print("Error while updating status $output");
+      }
+    } catch (err) {
+      print("Error while updating status $err");
+    }
+  }
+
+  Future<void> updateRequestStatus(
+      List<Map<String, String>> data, BuildContext context) async {
+    try {
       SharedPreferences preferences = await SharedPreferences.getInstance();
       String? userId = preferences.getString("userId");
 
       print("User data $data");
       final String url = "$MAINURL/api/v3/request/updateStatus";
 
-
-      var body = {
-        "updates":data
-      };
+      var body = {"updates": data};
 
       final response = await http.patch(Uri.parse(url),
           body: json.encode(body),
           headers: {"Content-Type": "application/json"});
-
-
 
       if (response.statusCode == 200) {
         Fluttertoast.showToast(msg: "Request Status modified");
@@ -108,35 +131,31 @@ class RequestApi {
     }
   }
 
-  Future<List<UserAssignedGuardian>> getGuardianByUserId()async{
-    try{
+  Future<List<UserAssignedGuardian>> getGuardianByUserId() async {
+    try {
       SharedPreferences preferences = await SharedPreferences.getInstance();
-      String ? userId = preferences.getString("userId");
+      String? userId = preferences.getString("userId");
 
       final String url = "$MAINURL/api/v3/request/getUserbyId/$userId";
 
-
       var response = await http.get(Uri.parse(url));
 
-      if(response.statusCode==200){
+      if (response.statusCode == 200) {
         var data = json.decode(response.body);
 
         List<UserAssignedGuardian> guardians = (data['data'] as List)
             .map((json) => UserAssignedGuardian.fromJson(json))
             .toList();
 
-
         return guardians;
-
-      }else{
+      } else {
         var data = json.decode(response.body);
         print("error $data");
         return [];
       }
-    }catch(err){
+    } catch (err) {
       print("Error while getting guardian by userId $err");
       return [];
     }
   }
-
 }

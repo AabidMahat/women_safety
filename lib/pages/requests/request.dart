@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:women_safety/Database/Database.dart';
-import 'package:women_safety/api/Guardian.dart';
-import 'package:women_safety/api/User.dart';
 import 'package:women_safety/api/requestApi.dart';
 import 'package:women_safety/pages/profile/profile.dart';
 import 'package:women_safety/utils/loader.dart';
@@ -23,9 +20,11 @@ class _RequestPageState extends State<RequestPage>
     with SingleTickerProviderStateMixin {
   List<UserAssignedGuardian> users = [];
   List<Map<String, String>> userData = [];
+  List<Map<String, String>> removedRequestIds = [];
   List<UserAssignedGuardian> acceptedUser = [];
   bool isLoading = false;
   bool isUpdating = false;
+  bool isDeleting = false;
   late AnimationController _animationController;
   late Animation<Offset> _slideAnimation;
 
@@ -36,7 +35,8 @@ class _RequestPageState extends State<RequestPage>
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
-    )..repeat(reverse: true);
+    )
+      ..repeat(reverse: true);
 
     _slideAnimation = Tween<Offset>(
       begin: Offset(0, 0),
@@ -55,9 +55,9 @@ class _RequestPageState extends State<RequestPage>
     await RequestApi().getGuardianByUserId();
     setState(() {
       users = assignedUsers;
-
       userData = users
-          .map((user) => {
+          .map((user) =>
+      {
         "phoneNumber": user.phoneNumber,
         "status": user.status,
         "name": user.name
@@ -68,31 +68,34 @@ class _RequestPageState extends State<RequestPage>
     });
   }
 
+
+  void deleteRequest() async {
+    setState(() {
+      isDeleting = true;
+    });
+
+    await RequestApi().deleteRequest(removedRequestIds, context);
+
+    setState(() {
+      isDeleting = false;
+    });
+  }
+
   @override
   void dispose() {
     _animationController.dispose();
     super.dispose();
   }
 
-  void approveAction(int index, String userId) {
+
+
+  void declineAction(int index, String name) {
     setState(() {
-      int userDataIndex =
-      userData.indexWhere((data) => data["userId"] == userId);
-      userData[userDataIndex]['status'] = "approved";
+      int userDataIndex = userData.indexWhere((data) => data["name"] == name);
+      //  Add removed userIds
+      removedRequestIds.add({"phoneNumber": userData[userDataIndex]['phoneNumber']!});
 
-      acceptedUser.add(users[userDataIndex]);
 
-      users.removeAt(index);
-    });
-
-    Fluttertoast.showToast(msg: "Request Approved");
-  }
-
-  void declineAction(int index, String userId) {
-    setState(() {
-      int userDataIndex =
-      userData.indexWhere((data) => data["userId"] == userId);
-      userData[userDataIndex]['status'] = "declined";
       users.removeAt(index);
     });
 
@@ -176,6 +179,7 @@ class _RequestPageState extends State<RequestPage>
               padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
               child: Dismissible(
                 key: Key(user.phoneNumber),
+                direction: DismissDirection.endToStart,
                 background: Container(
                   color: Colors.green.shade900,
                   alignment: Alignment.centerLeft,
@@ -189,78 +193,78 @@ class _RequestPageState extends State<RequestPage>
                   alignment: Alignment.centerRight,
                   child: const Padding(
                     padding: EdgeInsets.only(right: 20),
-                    child: Icon(Icons.cancel_outlined, color: Colors.white, size: 30),
+                    child: Icon(
+                        Icons.cancel_outlined, color: Colors.white, size: 30),
                   ),
                 ),
                 onDismissed: (direction) {
-                  if (direction == DismissDirection.startToEnd) {
-                    // approveAction(index, user.id);
-                  } else if (direction == DismissDirection.endToStart) {
-                    // declineAction(index, user.id);
-                  }
+                  // Handle remove request
+                  declineAction(index, user.name);
                 },
                 child: Container(
-              decoration: BoxDecoration(
-              color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.blue.shade100.withOpacity(0.5), // blue shadow color
-                    spreadRadius: 2,
-                    blurRadius: 6,
-                    offset: const Offset(0, 3), // changes position of shadow
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.blue.shade100.withOpacity(0.5),
+                        // blue shadow color
+                        spreadRadius: 2,
+                        blurRadius: 6,
+                        offset: const Offset(
+                            0, 3), // changes position of shadow
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          user.name,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Row(
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(Icons.phone, color: Colors.grey.shade600, size: 18),
-                            const SizedBox(width: 6),
                             Text(
-                              user.phoneNumber,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey.shade700,
+                              user.name,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
                               ),
                             ),
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                Icon(Icons.phone, color: Colors.grey.shade600,
+                                    size: 18),
+                                const SizedBox(width: 6),
+                                Text(
+                                  user.phoneNumber,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey.shade700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            getStatusBadge(user.status),
                           ],
                         ),
-                        const SizedBox(height: 6),
-                        getStatusBadge(user.status),
+                        SlideTransition(
+                          position: _slideAnimation,
+                          child: Icon(
+                            Icons.arrow_forward_ios_outlined,
+                            color: Colors.green.shade900,
+                          ),
+                        ),
                       ],
                     ),
-                    SlideTransition(
-                      position: _slideAnimation,
-                      child: Icon(
-                        Icons.arrow_forward_ios_outlined,
-                        color: Colors.green.shade900,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
+
               ),
-            ),
-
-            ),
             );
-
           },
         ),
       ),
@@ -269,9 +273,9 @@ class _RequestPageState extends State<RequestPage>
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
         child: AdvanceButton(
           onPressed: () {
-            // updateList();
+            deleteRequest();
           },
-          isLoading: isUpdating,
+          isLoading: isDeleting,
           buttonText: 'Save',
           backgroundColor: Colors.green.shade900,
           prefixIcon: Icons.check,
