@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:women_safety/api/EmergencyCall.dart';
 import 'package:women_safety/api/Permission.dart';
 import 'package:women_safety/api/sendNotification.dart';
+import 'package:women_safety/pages/communities/displayAllCommunities.dart';
 import 'package:women_safety/pages/videos/DisplayAllVideos.dart';
 import 'package:women_safety/pages/DisplayAudios.dart';
 import 'package:women_safety/utils/quotes.dart';
@@ -192,6 +193,11 @@ class _HomeScreenState extends State<HomeScreen> {
             // Set a fixed size
             label: 'Notify',
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.group_work_outlined, size: 28),
+            // Set a fixed size
+            label: 'Communities',
+          ),
         ],
         selectedItemColor: Colors.teal[800],
         unselectedItemColor: Colors.black,
@@ -210,6 +216,9 @@ class _HomeScreenState extends State<HomeScreen> {
               SendNotification().sendNotification(
                   "Demo Notification", "For trial Purpose", ["670f3cd307565c85a58b096b"]);
               break;
+            case 3:
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ShowAllCommunities()));
           }
         },
       ),

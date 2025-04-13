@@ -245,3 +245,31 @@ class UserAssignedGuardian {
     );
   }
 }
+
+
+class Community{
+  final String name;
+  final String createdBy;
+  DateTime createdAt;
+  final String description;
+  final String imageUrl;
+  final int memberCount;
+
+  Community(
+      {required this.name,required this.createdBy,
+        required this.createdAt, required this.description,
+        required this.imageUrl, this.memberCount=0});
+
+  factory Community.fromJson(Map<String, dynamic> json){
+    return Community(
+      name: json["name"],
+      createdBy: json["createdBy"],
+      imageUrl: json["profileImage"],
+      description: json["description"],
+      createdAt: DateTime.tryParse(json["createdAt"] ?? "") ?? DateTime.now(),
+      memberCount: json["memberCount"] ?? 0,
+    );
+  }
+
+
+}
