@@ -4,7 +4,9 @@ import 'package:page_transition/page_transition.dart';
 import 'package:women_safety/Database/Database.dart';
 import 'package:women_safety/api/communityApi.dart';
 import 'package:women_safety/home_screen.dart';
+import 'package:women_safety/pages/communities/communityHomeScreen.dart';
 import 'package:women_safety/pages/communities/createCommunityScreen.dart';
+import 'package:women_safety/pages/communities/exploreCommunities.dart';
 import 'package:women_safety/utils/loader.dart';
 import 'package:women_safety/widgets/customAppBar.dart';
 import 'package:women_safety/widgets/noData.dart';
@@ -28,7 +30,7 @@ class _ShowAllCommunitiesState extends State<ShowAllCommunities> {
   }
 
   Future<void> fetchUserCommunities() async {
-    CommunityApi communityApi = CommunityApi();; // Replace with actual user ID (e.g. from local storage or auth)
+    CommunityApi communityApi = CommunityApi();
     List<Community> data = await communityApi.getUserCommunities();
     setState(() {
       communities = data;
@@ -54,6 +56,17 @@ class _ShowAllCommunitiesState extends State<ShowAllCommunities> {
         backgroundColor: Colors.green.shade900,
         textColor: Colors.white,
         leadingIcon: Icons.arrow_back,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.explore, color: Colors.white),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ExploreCommunitiesScreen()),
+              );
+            },
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -84,7 +97,10 @@ class _ShowAllCommunitiesState extends State<ShowAllCommunities> {
               title: Text(community.name),
               subtitle: Text(community.description),
               onTap: () {
-                // Optional: Navigate to community details
+                Navigator.push(context, PageTransition(
+                    child: CommunityHomePage(community: community),
+                    type: PageTransitionType.leftToRight,
+                    duration: Duration(milliseconds: 400)));
               },
             ),
           );

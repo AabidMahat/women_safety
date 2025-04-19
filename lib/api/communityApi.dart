@@ -1,16 +1,11 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:women_safety/api/Firebase_api.dart';
 
 import '../Database/Database.dart';
 import '../consts/AppConts.dart';
-import '../home_screen.dart';
 
 class CommunityApi{
 
@@ -96,4 +91,100 @@ class CommunityApi{
 
   }
 
+  Future<List<Community>> getAllCommunitiesPaginated(int page, int limit) async{
+    try {
+      final String url = "${MAINURL}/api/v3/community/getAllCommunitiesPaginated?limit=${limit}&page=${page}";
+
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        List<Community> newCommunities = (data['data'] as List)
+            .map((json) => Community.fromJson(json))
+            .toList();
+        return newCommunities;
+      }
+      else {
+        print("Error response: ${response.body}");
+
+        return [];
+      }
+    }
+    catch(err) {
+      print("Error fetching communities: $err");
+      return [];
+    }
+
+
+  }
+
+  Future<bool> joinCommunity(String communityId) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> joinedCommunities = prefs.getStringList("communities")?? [];
+    String userId = prefs.getString("userId")?? "";
+    joinedCommunities.remove(communityId);
+
+    String url = "$MAINURL/api/v3/community/joinCommunity";
+
+    var body = {"userId": userId, "communityId": communityId};
+
+    try{
+      var response = await http.post(Uri.parse(url),
+        body: json.encode(body),
+        headers: {"Content-Type": "application/json"});
+
+      var message = json.decode(response.body);
+      if (response.statusCode == 200) {
+        Fluttertoast.showToast(msg: message['message']);
+        return true;
+      }
+      else{
+        print("Error response: ${response.body}");
+        Fluttertoast.showToast(msg: "error performing this action ${response.body}");
+        return false;
+      }
+    }
+    catch(err){
+      print(err);
+      Fluttertoast.showToast(msg: "error performing this action $err");
+      return false;
+    }
+  }
+
+  Future<bool> leaveCommunity(String communityId) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> joinedCommunities = prefs.getStringList("communities")?? [];
+    String userId = prefs.getString("userId")?? "";
+    joinedCommunities.remove(communityId);
+
+    String url = "$MAINURL/api/v3/community/leaveCommunity";
+
+    var body = {"userId": userId, "communityId": communityId};
+
+    try{
+      var response = await http.post(Uri.parse(url),
+          body: json.encode(body),
+          headers: {"Content-Type": "application/json"});
+
+      var message = json.decode(response.body);
+      if (response.statusCode == 200) {
+        print(message['message']);
+        Fluttertoast.showToast(msg: message['message']);
+        return true;
+      }
+      else{
+        print("Error response: ${response.body}");
+        Fluttertoast.showToast(msg: "error performing this action ${response.body}");
+        return false;
+      }
+    }
+    catch(err){
+      print(err);
+      Fluttertoast.showToast(msg: "error performing this action $err");
+      return false;
+    }
+  }
+
+
 }
+
