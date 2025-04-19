@@ -1,65 +1,104 @@
+import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:women_safety/api/communityApi.dart';
 import 'package:women_safety/home_screen.dart';
 import 'package:women_safety/widgets/customAppBar.dart';
+import 'package:path/path.dart' as path;
 
-class CreateCommunityScreen extends StatefulWidget{
+class CreateCommunityScreen extends StatefulWidget {
   @override
   _CreateCommunityScreenState createState() => _CreateCommunityScreenState();
 }
 
-class _CreateCommunityScreenState extends State<CreateCommunityScreen>{
-
+class _CreateCommunityScreenState extends State<CreateCommunityScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _imageUrlController = TextEditingController();
-
+  File? _imageFile;
+  String? _imageUrl;
 
   final communityApi = CommunityApi();
   bool isLoading = false;
 
-  void createCommunity() async{
+  Future<void> createCommunity() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userId= prefs.getString("userId");
+    String? userId = prefs.getString("userId");
 
     if (userId == null || userId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("User ID not found")));
       return;
     }
 
-    if (_nameController.text.isEmpty || _descriptionController.text.isEmpty || _imageUrlController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please fill all fields")));
+    if (_nameController.text.isEmpty || _descriptionController.text.isEmpty || _imageUrl == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please fill all fields and upload an image")));
       return;
     }
 
-    String usersId = userId;
-
-    try{
-      setState(() {
-        isLoading = true;
-      });
+    try {
+      setState(() => isLoading = true);
 
       final Map<String, dynamic> communityData = {
         "name": _nameController.text.trim(),
-        "createdBy": usersId,
+        "createdBy": userId,
         "description": _descriptionController.text.trim(),
-        "imageUrl": _imageUrlController.text.trim(),
+        "imageUrl": _imageUrl,
       };
 
-      await communityApi.createCommunity(usersId, communityData);
+      await communityApi.createCommunity(userId, communityData);
 
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Community Created Successfully")));
+
+      // Optional: Clear form
+      _nameController.clear();
+      _descriptionController.clear();
       setState(() {
+        _imageFile = null;
+        _imageUrl = null;
         isLoading = false;
       });
+
+      Navigator.pushReplacement(
+        context,
+        PageTransition(
+          child: HomeScreen(),
+          type: PageTransitionType.rightToLeft,
+          duration: Duration(milliseconds: 400),
+        ),
+      );
+    } catch (err) {
+      setState(() => isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: ${err.toString()}")));
     }
-    catch (err) {
-      setState(() {
-        isLoading = false;
-      });
+  }
+
+  Future<void> pickImage() async {
+    print("picking the image");
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() => _imageFile = File(pickedFile.path));
+      await uploadImageToFirebase();
+    }
+  }
+
+  Future<void> uploadImageToFirebase() async {
+    try {
+      if (_imageFile == null) return;
+
+      final fileName = path.basename(_imageFile!.path);
+      final storageRef = FirebaseStorage.instance.ref().child('community_images/$fileName');
+      final uploadTask = storageRef.putFile(_imageFile!);
+      final snapshot = await uploadTask;
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+
+
+      print("image url: $downloadUrl");
+      setState(() => _imageUrl = downloadUrl);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Image upload failed: ${e.toString()}")));
     }
   }
 
@@ -68,52 +107,66 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen>{
     return Scaffold(
       appBar: customAppBar(
         "Create Community",
-        onPressed: (){
+        onPressed: () {
           Navigator.pop(
-              context,
+            context,
             PageTransition(
               child: HomeScreen(),
               type: PageTransitionType.rightToLeft,
-              duration: Duration(microseconds: 400)
-            )
+              duration: Duration(milliseconds: 400),
+            ),
           );
         },
         backgroundColor: Colors.green.shade900,
         textColor: Colors.white,
         leadingIcon: Icons.arrow_back,
       ),
-
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(labelText: "Community Name"),
-            ),
-            TextField(
-              controller: _descriptionController,
-              decoration: InputDecoration(labelText: "Description"),
-              maxLines: 3,
-            ),
-            TextField(
-              controller: _imageUrlController,
-              decoration: InputDecoration(labelText: "Image URL"),
-            ),
-            SizedBox(height: 20),
-            isLoading
-                ? CircularProgressIndicator()
-                : ElevatedButton(
-              onPressed: createCommunity,
-              child: Text("Create Community"),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.green.shade900),
-            )
-          ],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              GestureDetector(
+                onTap: pickImage,
+                child: Container(
+                  height: 150,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: _imageFile != null
+                      ? Image.file(_imageFile!, fit: BoxFit.cover)
+                      : Center(child: Text("Tap to select an image")),
+                ),
+              ),
+              SizedBox(height: 10),
+              TextField(
+                controller: _nameController,
+                decoration: InputDecoration(labelText: "Community Name"),
+              ),
+              SizedBox(height: 10),
+              TextField(
+                controller: _descriptionController,
+                decoration: InputDecoration(labelText: "Description"),
+                maxLines: 3,
+              ),
+              SizedBox(height: 20),
+              isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: createCommunity,
+                  child: Text("Create Community"),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green.shade900),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
-
   }
-
-
 }

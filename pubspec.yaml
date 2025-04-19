@@ -51,7 +51,7 @@ dependencies:
   web_socket_channel:
 
   #    Firebase
-  firebase_core:
+  firebase_core: ^2.27.0
   firebase_messaging:
   firebase_analytics:
   cloud_firestore:
@@ -78,7 +78,7 @@ dependencies:
   dio:
 
   #    image
-  image_picker:
+  image_picker: ^1.0.8
 
   #  Hardware devices
   volume_watcher:
@@ -87,6 +87,7 @@ dependencies:
 
   #Design
   particles_flutter: ^1.0.1
+  path: ^1.8.3
 
 
 dev_dependencies:
