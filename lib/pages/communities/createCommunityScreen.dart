@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -94,7 +93,6 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen> {
       final snapshot = await uploadTask;
       final downloadUrl = await snapshot.ref.getDownloadURL();
 
-
       print("image url: $downloadUrl");
       setState(() => _imageUrl = downloadUrl);
     } catch (e) {
@@ -130,39 +128,64 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen> {
               GestureDetector(
                 onTap: pickImage,
                 child: Container(
-                  height: 150,
+                  height: 180,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.grey.withOpacity(0.5)),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        offset: Offset(0, 4),
+                        blurRadius: 8,
+                      ),
+                    ],
                   ),
                   child: _imageFile != null
-                      ? Image.file(_imageFile!, fit: BoxFit.cover)
-                      : Center(child: Text("Tap to select an image")),
+                      ? ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.file(_imageFile!, fit: BoxFit.cover),
+                  )
+                      : Center(child: Icon(Icons.add_a_photo, color: Colors.grey, size: 40)),
                 ),
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 20),
+              Text("Community Name", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
               TextField(
                 controller: _nameController,
-                decoration: InputDecoration(labelText: "Community Name"),
-              ),
-              SizedBox(height: 10),
-              TextField(
-                controller: _descriptionController,
-                decoration: InputDecoration(labelText: "Description"),
-                maxLines: 3,
+                decoration: InputDecoration(
+                  hintText: "Enter community name",
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                ),
               ),
               SizedBox(height: 20),
+              Text("Description", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              TextField(
+                controller: _descriptionController,
+                decoration: InputDecoration(
+                  hintText: "Enter community description",
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                ),
+                maxLines: 4,
+              ),
+              SizedBox(height: 30),
               isLoading
                   ? Center(child: CircularProgressIndicator())
                   : SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: createCommunity,
-                  child: Text("Create Community"),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green.shade900),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.green.shade900,
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: Text("Create Community", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 ),
               ),
+              SizedBox(height: 20),
             ],
           ),
         ),

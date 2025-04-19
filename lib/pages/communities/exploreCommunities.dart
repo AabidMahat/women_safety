@@ -18,7 +18,7 @@ class _ExploreCommunitiesScreenState extends State<ExploreCommunitiesScreen> {
   final ScrollController _scrollController = ScrollController();
   List<Community> _communities = [];
   int _currentPage = 1;
-  bool _isLoading = false;
+  bool _isLoading = true;
   bool _hasMore = true;
 
   final int _limit = 5;
@@ -35,6 +35,8 @@ class _ExploreCommunitiesScreenState extends State<ExploreCommunitiesScreen> {
       }
     });
   }
+
+
 
   Future<void> _fetchCommunities() async {
     setState(() => _isLoading = true);
@@ -53,6 +55,26 @@ class _ExploreCommunitiesScreenState extends State<ExploreCommunitiesScreen> {
     }
   }
 
+  Future<void> _refreshUserCommunities() async{
+    setState(() => _isLoading = true);
+
+    try {
+      setState(() {
+        _currentPage = 1;
+      });
+      List<Community> newCommunities = await communityApi.getAllCommunitiesPaginated(_currentPage, _limit);
+
+      setState(() {
+        _currentPage++;
+        _isLoading = false;
+        _hasMore = newCommunities.length == _limit;
+        _communities = newCommunities;
+      });
+    } catch (err) {
+      setState(() => _isLoading = false);
+    }
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,38 +85,83 @@ class _ExploreCommunitiesScreenState extends State<ExploreCommunitiesScreen> {
       ),
       body: Container(
         color: Colors.grey[100],
-        child: ListView.builder(
-          controller: _scrollController,
-          itemCount: _communities.length + (_isLoading ? 1 : 0),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          itemBuilder: (context, index) {
-            if (index < _communities.length) {
+        child: _communities.isEmpty && _isLoading?
+        Loader(context)
+        : _communities.isEmpty
+            ? noData("No communities found")
+        : RefreshIndicator(
+          onRefresh: _refreshUserCommunities,
+          child: ListView.builder(
+            itemCount: _communities.length,
+            physics: const AlwaysScrollableScrollPhysics(), // important for pull even when full
+            itemBuilder: (context, index) {
               final community = _communities[index];
-              return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: ListTile(
-                  leading: CircleAvatar(
-                      backgroundImage: community.imageUrl == "default.png" ?
-                      NetworkImage("https://people.math.sc.edu/Burkardt/data/png/washington.png") as ImageProvider
-                          : NetworkImage(community.imageUrl) as ImageProvider
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    PageTransition(
+                      child: CommunityHomePage(community: community),
+                      type: PageTransitionType.leftToRight,
+                      duration: const Duration(milliseconds: 400),
+                    ),
+                  );
+                },
+                child: Container(
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 6,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
                   ),
-                  title: Text(community.name),
-                  subtitle: Text(community.description),
-                  onTap: () {
-                    Navigator.push(context, PageTransition(
-                        child: CommunityHomePage(community: community),
-                        type: PageTransitionType.leftToRight,
-                        duration: Duration(milliseconds: 400)));
-                  },
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 30,
+                        backgroundImage: community.imageUrl == "default.png"
+                            ? NetworkImage("https://people.math.sc.edu/Burkardt/data/png/washington.png")
+                            : NetworkImage(community.imageUrl),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              community.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              community.description,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey.shade700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey),
+                    ],
+                  ),
                 ),
               );
-            } else {
-              return const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Center(child: CircularProgressIndicator()),
-              );
-            }
-          },
+            },
+          ),
         ),
       ),
     );

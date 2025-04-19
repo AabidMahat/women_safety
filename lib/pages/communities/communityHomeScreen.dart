@@ -15,10 +15,9 @@ class CommunityHomePage extends StatefulWidget {
 }
 
 class _CommunityHomePageState extends State<CommunityHomePage> {
-
   bool isJoined = false;
   CommunityApi communityApi = CommunityApi();
-  bool joinButtonLoading  = false;
+  bool joinButtonLoading = false;
   List<Post> posts = [];
   int currentPage = 1;
   final int limit = 3;
@@ -29,13 +28,12 @@ class _CommunityHomePageState extends State<CommunityHomePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     isMember();
     fetchPosts();
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
-        // Load more posts when 200 pixels close to bottom
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 200) {
         fetchPosts();
       }
     });
@@ -49,55 +47,44 @@ class _CommunityHomePageState extends State<CommunityHomePage> {
 
   void isMember() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> joinedCommunities = prefs.getStringList("communities")?? [];
-    print("joined communities: $joinedCommunities");
+    List<String> joinedCommunities =
+        prefs.getStringList("communities") ?? [];
     setState(() {
-      print("joined communities: $joinedCommunities");
-      print("current community: ${widget.community.id}");
       isJoined = joinedCommunities.contains(widget.community.id);
     });
-
   }
 
-  void toggleJoinStatus() async{
+  void toggleJoinStatus() async {
     bool toggle;
 
-    setState(() {
-      joinButtonLoading = true;
-    });
-    if(isJoined){
+    setState(() => joinButtonLoading = true);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> joinedCommunities =
+        prefs.getStringList("communities") ?? [];
+
+    if (isJoined) {
       toggle = await communityApi.leaveCommunity(widget.community.id);
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      List<String> joinedCommunities = prefs.getStringList("communities")?? [];
       joinedCommunities.remove(widget.community.id);
-      prefs.setStringList("communities", joinedCommunities);
-    }
-    else{
+    } else {
       toggle = await communityApi.joinCommunity(widget.community.id);
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      List<String> joinedCommunities = prefs.getStringList("communities")?? [];
       joinedCommunities.add(widget.community.id);
-      prefs.setStringList("communities", joinedCommunities);
     }
+
+    await prefs.setStringList("communities", joinedCommunities);
 
     setState(() {
       joinButtonLoading = false;
-
-      if(toggle){
-        isJoined = !isJoined;
-      }
+      if (toggle) isJoined = !isJoined;
     });
   }
 
   void fetchPosts() async {
     if (isLoadingPosts || !hasMorePosts) return;
 
-    setState(() {
-      isLoadingPosts = true;
-    });
+    setState(() => isLoadingPosts = true);
 
-    List<Post> newPosts = await postsApi.getCommunityPostsPaginated(currentPage, limit, widget.community.id);
-    print("posts: $newPosts");
+    List<Post> newPosts = await postsApi.getCommunityPostsPaginated(
+        currentPage, limit, widget.community.id);
 
     setState(() {
       posts.addAll(newPosts);
@@ -110,8 +97,6 @@ class _CommunityHomePageState extends State<CommunityHomePage> {
     });
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     final community = widget.community;
@@ -119,127 +104,174 @@ class _CommunityHomePageState extends State<CommunityHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(community.name),
+        backgroundColor: Colors.green.shade900,
+        elevation: 4,
       ),
-      body:ListView(
-      controller: _scrollController,
-      padding: const EdgeInsets.all(16.0),
-      children: [
-        // Community Avatar
-        CircleAvatar(
-            radius: 50,
-            backgroundImage: community.imageUrl == "default.png" ?
-            NetworkImage("https://cdn.pixabay.com/photo/2020/06/06/19/23/lgbt-5267848_1280.png") as ImageProvider
-                : NetworkImage(community.imageUrl) as ImageProvider
-        ),
-        const SizedBox(height: 12),
+      body: SingleChildScrollView(
+        controller: _scrollController,
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            // Community Info Card
+            Card(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              elevation: 4,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundImage: community.imageUrl == "default.png"
+                          ? NetworkImage(
+                          "https://cdn.pixabay.com/photo/2020/06/06/19/23/lgbt-5267848_1280.png")
+                      as ImageProvider
+                          : NetworkImage(community.imageUrl),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      community.name,
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '${community.memberCount} members',
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                    const SizedBox(height: 16),
+                    joinButtonLoading
+                        ? const CircularProgressIndicator()
+                        : ElevatedButton.icon(
+                      icon: Icon(
+                          isJoined ? Icons.logout : Icons.group_add),
+                      onPressed: toggleJoinStatus,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                        isJoined ? Colors.grey : Colors.green.shade700,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
+                      ),
+                      label: Text(isJoined ? 'Leave Community' : 'Join Community'),
+                    ),
+                    const SizedBox(height: 16),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        community.description,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
 
-        // Name and Members Count
-        Text(
-          community.name,
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 4),
-        Text('${community.memberCount} members'),
-
-        const SizedBox(height: 16),
-
-        // Join/Leave Button
-        joinButtonLoading
-            ? const CircularProgressIndicator()
-            : ElevatedButton(
-          onPressed: toggleJoinStatus,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: isJoined ? Colors.grey : Colors.blue,
-          ),
-          child: Text(isJoined ? 'Leave' : 'Join'),
-        ),
-
-        const SizedBox(height: 24),
-
-        // Description
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            community.description,
-            style: const TextStyle(fontSize: 16),
-          ),
-        ),
-
-        const SizedBox(height: 24),
-
-        // Create Post Button
-        ElevatedButton.icon(
-          onPressed: () async {
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            String? userId = prefs.getString("userId");
-
-            if (userId != null) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CreatePostPage(
-                    userId: userId,
-                    communityId: widget.community.id,
+            // Create Post Button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.edit),
+                label: const Text("Create Post"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-              );
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("User ID not found")),
-              );
-            }
-          },
-          icon: const Icon(Icons.edit),
-          label: const Text("Create Post"),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          ),
-        ),
+                onPressed: () async {
+                  SharedPreferences prefs =
+                  await SharedPreferences.getInstance();
+                  String? userId = prefs.getString("userId");
 
-        const SizedBox(height: 24),
+                  if (userId != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CreatePostPage(
+                          userId: userId,
+                          communityId: community.id,
+                        ),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("User ID not found")),
+                    );
+                  }
+                },
+              ),
+            ),
 
-        const Divider(),
+            const SizedBox(height: 32),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Community Posts",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 16),
 
-        const Text(
-          "Community Posts",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-
-        const SizedBox(height: 16),
-
-        // Posts List
-        ...posts.map((post) => Card(
-          elevation: 2,
-          margin: const EdgeInsets.symmetric(vertical: 8),
-          child: ListTile(
-            title: Text(post.title),
-            subtitle: Text(post.description, maxLines: 2, overflow: TextOverflow.ellipsis),
-            onTap: () {
-              // Navigate to detailed post page
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PostDetailsPage(post: post),
+            // Posts
+            if (posts.isEmpty && !isLoadingPosts)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 32),
+                child: Column(
+                  children: const [
+                    Icon(Icons.forum, size: 48, color: Colors.grey),
+                    SizedBox(height: 8),
+                    Text(
+                      "No posts in this community yet.",
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ],
                 ),
-              );
-            },
-          ),
-        )),
-
-        if (isLoadingPosts)
-          const Center(child: Padding(
-            padding: EdgeInsets.all(8.0),
-            child: CircularProgressIndicator(),
-          )),
-
-        if (!hasMorePosts && posts.isEmpty)
-          const Center(child: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Text("No posts in this community."),
-          )),
-      ],
-    ),
+              ),
+            ...posts.map(
+                  (post) => Card(
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                child: ListTile(
+                  title: Text(
+                    post.title,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text(
+                    post.description,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PostDetailsPage(post: post),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+            if (isLoadingPosts)
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }
