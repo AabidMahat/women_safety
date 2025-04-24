@@ -1,5 +1,8 @@
+import 'package:carousel_slider/carousel_options.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:women_safety/Database/Database.dart';
 import 'package:women_safety/api/postsApi.dart';
 
@@ -21,6 +24,7 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
   final ScrollController _commentScrollController = ScrollController();
   final TextEditingController _commentController = TextEditingController();
   bool isSubmitting = false;
+  int _activeImageIndex = 0;
 
   @override
   void initState() {
@@ -128,6 +132,47 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
                           post.description,
                           style: const TextStyle(fontSize: 16),
                         ),
+                        if (post.images != null && post.images.isNotEmpty)
+                          Column(
+                            children: [
+                              CarouselSlider.builder(
+                                itemCount: post.images.length,
+                                itemBuilder: (context, index, realIdx) {
+                                  return ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Image.network(
+                                      post.images[index],
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                    ),
+                                  );
+                                },
+                                options: CarouselOptions(
+                                  height: 250,
+                                  enlargeCenterPage: true,
+                                  enableInfiniteScroll: false,
+                                  viewportFraction: 0.9,
+                                  onPageChanged: (index, reason) {
+                                    setState(() {
+                                      _activeImageIndex = index;
+                                    });
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              AnimatedSmoothIndicator(
+                                activeIndex: _activeImageIndex,
+                                count: post.images.length,
+                                effect: const WormEffect(
+                                  dotHeight: 10,
+                                  dotWidth: 10,
+                                  activeDotColor: Colors.green,
+                                  dotColor: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+
                       ],
                     ),
                   ),

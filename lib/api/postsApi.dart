@@ -24,6 +24,7 @@ class PostApi{
             "createdBy": postData["createdBy"],
             "description": postData["description"],
             "communityId": postData["communityId"],
+            "images": postData["images"]??[],
           })
       ).timeout(Duration(seconds: 10));
 

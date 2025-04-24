@@ -50,6 +50,13 @@ class _ExploreCommunitiesScreenState extends State<ExploreCommunitiesScreen> {
         _hasMore = newCommunities.length == _limit;
         _communities.addAll(newCommunities);
       });
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_scrollController.position.maxScrollExtent <= _scrollController.position.viewportDimension && _hasMore) {
+          _fetchCommunities();
+        }
+      });
+
     } catch (err) {
       setState(() => _isLoading = false);
     }
@@ -92,75 +99,83 @@ class _ExploreCommunitiesScreenState extends State<ExploreCommunitiesScreen> {
         : RefreshIndicator(
           onRefresh: _refreshUserCommunities,
           child: ListView.builder(
-            itemCount: _communities.length,
-            physics: const AlwaysScrollableScrollPhysics(), // important for pull even when full
-            itemBuilder: (context, index) {
-              final community = _communities[index];
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    PageTransition(
-                      child: CommunityHomePage(community: community),
-                      type: PageTransitionType.leftToRight,
-                      duration: const Duration(milliseconds: 400),
+            itemCount: _communities.length + (_isLoading && _hasMore ? 1 : 0),
+            physics: const AlwaysScrollableScrollPhysics(),// important for pull even when full
+            controller: _scrollController,
+              itemBuilder: (context, index) {
+                if (index < _communities.length) {
+                  final community = _communities[index];
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        PageTransition(
+                          child: CommunityHomePage(community: community),
+                          type: PageTransitionType.leftToRight,
+                          duration: const Duration(milliseconds: 400),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 6,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundImage: community.imageUrl == "default.png"
+                                ? const NetworkImage("https://people.math.sc.edu/Burkardt/data/png/washington.png")
+                                : NetworkImage(community.imageUrl),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  community.name,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  community.description,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey.shade700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey),
+                        ],
+                      ),
                     ),
                   );
-                },
-                child: Container(
-                  margin: const EdgeInsets.symmetric(vertical: 8),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 6,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 30,
-                        backgroundImage: community.imageUrl == "default.png"
-                            ? NetworkImage("https://people.math.sc.edu/Burkardt/data/png/washington.png")
-                            : NetworkImage(community.imageUrl),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              community.name,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              community.description,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey.shade700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey),
-                    ],
-                  ),
-                ),
-              );
-            },
+                } else {
+                  return const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+              },
           ),
         ),
       ),

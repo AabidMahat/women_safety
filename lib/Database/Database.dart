@@ -283,10 +283,11 @@ class Post{
   DateTime createdAt;
   final String description;
   final int likesCount;
+  List<String> images;
 
   Post(
       {required this.id, required this.title,required this.createdBy,
-        required this.createdAt, required this.description, this.likesCount=0});
+        required this.createdAt, required this.description, this.likesCount=0, required this.images});
 
   factory Post.fromJson(Map<String, dynamic> json){
     return Post(
@@ -296,6 +297,10 @@ class Post{
       description: json["description"],
       createdAt: DateTime.tryParse(json["createdAt"] ?? "") ?? DateTime.now(),
       likesCount: json["likesCount"] ?? 0,
+      images : (json['images'] as List<dynamic>?)
+        ?.map((e) => e.toString())
+        .toList() ??
+        [],
     );
   }
 

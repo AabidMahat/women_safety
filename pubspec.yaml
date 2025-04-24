@@ -14,7 +14,7 @@ dependencies:
   #Design
   cupertino_icons: ^1.0.2
   font_awesome_flutter:
-  carousel_slider: ^4.1.1
+  carousel_slider: ^5.0.0
   webview_flutter: ^3.0.1
   curved_navigation_bar:
   page_transition:
@@ -88,6 +88,7 @@ dependencies:
   #Design
   particles_flutter: ^1.0.1
   path: ^1.8.3
+  smooth_page_indicator: ^1.2.1
 
 
 dev_dependencies:
