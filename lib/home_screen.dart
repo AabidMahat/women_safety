@@ -11,6 +11,8 @@ import 'package:women_safety/api/Permission.dart';
 import 'package:women_safety/api/sendNotification.dart';
 import 'package:women_safety/pages/videos/DisplayAllVideos.dart';
 import 'package:women_safety/pages/DisplayAudios.dart';
+import 'package:women_safety/utils/Procupine.dart';
+import 'package:women_safety/utils/SmsTemplate.dart';
 import 'package:women_safety/utils/quotes.dart';
 import 'package:women_safety/utils/shake.dart';
 import 'package:women_safety/widgets/Live_Safe.dart';
@@ -188,10 +190,11 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Recording',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.notification_add, size: 28),
+            icon: Icon(Icons.speaker_phone_rounded, size: 28),
             // Set a fixed size
-            label: 'Notify',
+            label: 'Voice',
           ),
+
         ],
         selectedItemColor: Colors.teal[800],
         unselectedItemColor: Colors.black,
@@ -207,9 +210,9 @@ class _HomeScreenState extends State<HomeScreen> {
               SendNotification().triggerRecording();
               break;
             case 2:
-              SendNotification().sendNotification(
-                  "Demo Notification", "For trial Purpose", ["670f3cd307565c85a58b096b"]);
+              Navigator.push(context, PageTransition(child: VoiceCommand(), type: PageTransitionType.leftToRight,duration: Duration(milliseconds: 400)));
               break;
+
           }
         },
       ),

@@ -23,8 +23,8 @@ void main()async  {
   String? userId = prefs.getString('userId');
   runApp(MaterialApp(
     navigatorKey: navigatorKey,
-    // home: userId==null? Splash():HomeScreen(),
-    home: Splash(),
+    home: userId==null? Splash():HomeScreen(),
+    // home: Splash(),
     debugShowCheckedModeBanner: false,
   ));
 }

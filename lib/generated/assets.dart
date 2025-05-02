@@ -10,12 +10,13 @@ class Assets {
   static const String androidSettings = 'assets/android/settings.gradle';
   static const String appBuild = 'assets/android/app/build.gradle';
   static const String appGoogleServices = 'assets/android/app/google-services.json';
-  static const String assetsAlert = 'assets/alert.png';
+  static const String assetsAlert = 'assets/alert.mp3';
   static const String assetsAmbulance = 'assets/ambulance.jpg';
   static const String assetsAndroidGradlew = 'assets/android/gradlew.bat';
   static const String assetsBusstop = 'assets/busstop.png';
   static const String assetsDefault = 'assets/default.png';
   static const String assetsFlame = 'assets/flame.jpg';
+  static const String assetsHelpMeEnAndroidV300 = 'assets/Help-Me_en_android_v3_0_0.ppn';
   static const String assetsHospital = 'assets/Hospital.png';
   static const String assetsLogo = 'assets/logo.png';
   static const String assetsMainLogo = 'assets/main_logo.png';
@@ -25,6 +26,7 @@ class Assets {
   static const String assetsPolice = 'assets/police.jpg';
   static const String assetsPolicebadge = 'assets/policebadge.png';
   static const String assetsRoute = 'assets/route.png';
+  static const String assetsSaveMeEnAndroidV300 = 'assets/Save-Me_en_android_v3_0_0.ppn';
   static const String assetsSecondaryLogo = 'assets/secondary-logo.jpeg';
   static const String assetsWomenSafety = 'assets/womenSafety.jpg';
   static const String assetsWomenSafetyApp = 'assets/womenSafety-app.png';
@@ -74,6 +76,7 @@ class Assets {
   static const String valuesNightV31Styles = 'assets/android/app/src/main/res/values-night-v31/styles.xml';
   static const String valuesStyles = 'assets/android/app/src/main/res/values/styles.xml';
   static const String valuesV31Styles = 'assets/android/app/src/main/res/values-v31/styles.xml';
+  static const String womenSafetyAssetsAlert = 'assets/alert.png';
   static const String womenSafetyAssetsAmbulance = 'assets/ambulance.png';
   static const String womenSafetyAssetsFlame = 'assets/flame.png';
   static const String womenSafetyAssetsPolice = 'assets/police.png';

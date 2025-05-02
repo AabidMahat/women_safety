@@ -13,7 +13,6 @@ import '../consts/AppConts.dart';
 import '../home_screen.dart';
 
 class UserApi {
-
   Future<List<UserData>> getUsers() async {
     try {
       final String url = "${MAINURL}/api/v3/user/getAllUsers";
@@ -49,8 +48,9 @@ class UserApi {
     }
   }
 
-  Future<Map<String,dynamic>> getUser(String userId) async {
-    String url = "$MAINURL/api/v3/user/getUser/$userId"; // URL to fetch the user data
+  Future<Map<String, dynamic>> getUser(String userId) async {
+    String url =
+        "$MAINURL/api/v3/user/getUser/$userId"; // URL to fetch the user data
     print("Fetching user with ID: $userId");
 
     try {
@@ -63,21 +63,21 @@ class UserApi {
         var body = json.decode(response.body);
         Fluttertoast.showToast(msg: body['message']);
         print("Error fetching user: $body");
-        return {};  // Return an empty map in case of an error
+        return {}; // Return an empty map in case of an error
       }
     } catch (err) {
       Fluttertoast.showToast(msg: err.toString());
       print("Exception fetching user: $err");
-      return {};  // Return an empty map if there's an exception
+      return {}; // Return an empty map if there's an exception
     }
   }
 
   Future<UserData> getUserProfile() async {
-
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    String ? userId = preferences.getString("userId");
+    String? userId = preferences.getString("userId");
 
-    final String url = "$MAINURL/api/v3/user/getUser/$userId"; // API endpoint to fetch user data
+    final String url =
+        "$MAINURL/api/v3/user/getUser/$userId"; // API endpoint to fetch user data
     print("Fetching user with ID: $userId");
 
     try {
@@ -102,7 +102,6 @@ class UserApi {
       return UserData.defaultUser();
     }
   }
-
 
   Future<List<String>> getGuardianName(List<String> guardianIds) async {
     try {
@@ -199,7 +198,6 @@ class UserApi {
             .toList();
 
         return users;
-
       } else {
         return [];
       }
@@ -239,10 +237,12 @@ class UserApi {
       return [];
     }
   }
+
   // Method to update a user
-  Future<void> updateUser(Map<String, dynamic> updatedData, BuildContext context) async {
+  Future<void> updateUser(
+      Map<String, dynamic> updatedData, BuildContext context) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    String ? userId = preferences.getString("userId");
+    String? userId = preferences.getString("userId");
     String url = "$MAINURL/api/v3/user/updateUser/$userId";
     try {
       var response = await http.patch(
@@ -290,8 +290,10 @@ class UserApi {
       Fluttertoast.showToast(msg: err.toString());
     }
   }
+
   // Method to add guardians
-  Future<void> addGuardian(String userId, Map<String, dynamic> guardianData, BuildContext context) async {
+  Future<void> addGuardian(String userId, Map<String, dynamic> guardianData,
+      BuildContext context) async {
     String url = "${MAINURL}/api/v3/user/addGuardian/$userId";
     print("UserID is: $userId");
     print("Guardian Data: $guardianData");
@@ -305,14 +307,14 @@ class UserApi {
         headers: {"Content-Type": "application/json"},
       );
 
-
-
       if (response.statusCode == 200) {
         Fluttertoast.showToast(msg: "Guardian updated successfully");
         print("Gaurdian updated Successfully");
       } else {
         print("Error Response: ${response.body}");
-        Fluttertoast.showToast(msg: json.decode(response.body)['message'] ?? "Failed to update guardian");
+        Fluttertoast.showToast(
+            msg: json.decode(response.body)['message'] ??
+                "Failed to update guardian");
       }
     } catch (err) {
       print("Failed to update guardian: $err");
@@ -331,6 +333,34 @@ class UserApi {
     } else {
       Fluttertoast.showToast(msg: "Error while storing image");
       return "";
+    }
+  }
+
+  Future<List<String>> getGuardianNumber(String userId) async {
+    try {
+      String url = "${MAINURL}/api/v3/user/allGuardianNumber";
+      List<String> numbers = [];
+      var body = {"userId": userId};
+
+      var response = await http.post(Uri.parse(url),
+          body: json.encode(body),
+          headers: {"Content-Type": "application/json"});
+
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+        print("Guardian Numbers ${data['data']} ");
+
+        // Convert List<dynamic> to List<String>
+        numbers = List<String>.from(data['data']);
+
+
+        return numbers;
+      } else {
+        return numbers;
+      }
+    } catch (err) {
+      Fluttertoast.showToast(msg: "Error while getting response");
+      return [];
     }
   }
 }

@@ -69,6 +69,7 @@ dependencies:
   #  Audio
   flutter_sound:
   audioplayers:
+  porcupine_flutter:
   #Date format
   intl:
 
@@ -87,6 +88,9 @@ dependencies:
 
   #Design
   particles_flutter: ^1.0.1
+
+  #sppech to text
+  speech_to_text:
 
 
 dev_dependencies:

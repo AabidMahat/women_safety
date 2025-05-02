@@ -39,6 +39,9 @@
     <uses-permission android:name="android.permission.CAMERA"/>
 
 
+<!--    Record Audio-->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
@@ -92,7 +95,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCToEfhcL7iTNZlEasmiPLY3VXSrCcS_bg" />
+            android:value="AIzaSyB12sshOIkEIKmy4_divM1f1BcJjWpT1O4" />
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />

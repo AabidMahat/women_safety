@@ -3,13 +3,15 @@ import 'dart:convert';
 import 'package:background_sms/background_sms.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:women_safety/api/User.dart';
 
 Future<void> sendSMS() async {
   try {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String phoneNumber = preferences.getString("phoneNumber")!;
+    String userId = preferences.getString("userId")!;
 
-    List<String> numbers = ['7559153594','7722091840'];
+    List<String> numbers = await UserApi().getGuardianNumber(userId);
 
     String? position = preferences.getString("userLocation");
 

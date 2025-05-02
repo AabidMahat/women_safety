@@ -54,6 +54,13 @@ class PermissionApi {
     }
   }
 
+  Future<void> requestRecordAuidoPermission()async{
+    final status = await Permission.microphone.request();
+    if (!status.isGranted) {
+      Fluttertoast.showToast(msg: 'Audio state permission is not granted');
+    }
+  }
+
   Future<void> requestSmsPermission() async {
     final status = await Permission.sms.request();
     if (!status.isGranted) {
