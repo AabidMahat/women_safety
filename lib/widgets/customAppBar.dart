@@ -6,6 +6,7 @@ PreferredSizeWidget customAppBar(
       Color? backgroundColor,
       Color? textColor,
       IconData? leadingIcon,
+      List<Widget>? actions
     }) {
   return AppBar(
     title: Text(
@@ -30,6 +31,7 @@ PreferredSizeWidget customAppBar(
       },
     )
         : null, // If no icon is provided, remove the leading widget
+    actions: actions,
     elevation: 4.0, // Add elevation for shadow effect
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(

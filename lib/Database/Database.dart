@@ -245,3 +245,83 @@ class UserAssignedGuardian {
     );
   }
 }
+
+
+class Community{
+  final String id;
+  final String name;
+  final String createdBy;
+  DateTime createdAt;
+  final String description;
+  final String imageUrl;
+  final int memberCount;
+
+  Community(
+      {required this.id, required this.name,required this.createdBy,
+        required this.createdAt, required this.description,
+        required this.imageUrl, this.memberCount=0});
+
+  factory Community.fromJson(Map<String, dynamic> json){
+    return Community(
+      id: json["_id"],
+      name: json["name"],
+      createdBy: json["createdBy"],
+      imageUrl: json["profileImage"],
+      description: json["description"],
+      createdAt: DateTime.tryParse(json["createdAt"] ?? "") ?? DateTime.now(),
+      memberCount: json["memberCount"] ?? 0,
+    );
+  }
+
+}
+
+
+class Post{
+  final String id;
+  final String title;
+  final String createdBy;
+  DateTime createdAt;
+  final String description;
+  final int likesCount;
+  List<String> images;
+
+  Post(
+      {required this.id, required this.title,required this.createdBy,
+        required this.createdAt, required this.description, this.likesCount=0, required this.images});
+
+  factory Post.fromJson(Map<String, dynamic> json){
+    return Post(
+      id: json["_id"],
+      title: json["title"],
+      createdBy: json["createdBy"]["_id"],
+      description: json["description"],
+      createdAt: DateTime.tryParse(json["createdAt"] ?? "") ?? DateTime.now(),
+      likesCount: json["likesCount"] ?? 0,
+      images : (json['images'] as List<dynamic>?)
+        ?.map((e) => e.toString())
+        .toList() ??
+        [],
+    );
+  }
+
+}
+
+class Comment{
+  final String userName;
+  final String comment;
+  final String userImage;
+  final DateTime createdAt;
+
+  Comment(
+      {required this.userName,required this.comment,
+        required this.userImage, required this.createdAt});
+
+  factory Comment.fromJson(Map<String, dynamic> json){
+    return Comment(
+        userName: json["userName"],
+        comment: json["comment"],
+        userImage: json["userImage"],
+        createdAt: DateTime.tryParse(json["createdAt"] ?? "") ?? DateTime.now(),
+    );
+  }
+}

@@ -14,7 +14,7 @@ dependencies:
   #Design
   cupertino_icons: ^1.0.2
   font_awesome_flutter:
-  carousel_slider: ^4.1.1
+  carousel_slider: ^5.0.0
   webview_flutter: ^3.0.1
   curved_navigation_bar:
   page_transition:
@@ -51,7 +51,7 @@ dependencies:
   web_socket_channel:
 
   #    Firebase
-  firebase_core:
+  firebase_core: ^2.27.0
   firebase_messaging:
   firebase_analytics:
   cloud_firestore:
@@ -79,7 +79,7 @@ dependencies:
   dio:
 
   #    image
-  image_picker:
+  image_picker: ^1.0.8
 
   #  Hardware devices
   volume_watcher:
@@ -88,6 +88,8 @@ dependencies:
 
   #Design
   particles_flutter: ^1.0.1
+  path: ^1.8.3
+  smooth_page_indicator: ^1.2.1
 
   #sppech to text
   speech_to_text:

@@ -3,16 +3,12 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:page_transition/page_transition.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:women_safety/api/EmergencyCall.dart';
 import 'package:women_safety/api/Permission.dart';
 import 'package:women_safety/api/sendNotification.dart';
-import 'package:women_safety/pages/videos/DisplayAllVideos.dart';
-import 'package:women_safety/pages/DisplayAudios.dart';
-import 'package:women_safety/utils/Procupine.dart';
-import 'package:women_safety/utils/SmsTemplate.dart';
+
 import 'package:women_safety/utils/quotes.dart';
 import 'package:women_safety/utils/shake.dart';
 import 'package:women_safety/widgets/Live_Safe.dart';
@@ -190,11 +186,10 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Recording',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.speaker_phone_rounded, size: 28),
+            icon: Icon(Icons.notification_add, size: 28),
             // Set a fixed size
-            label: 'Voice',
+            label: 'Notify',
           ),
-
         ],
         selectedItemColor: Colors.teal[800],
         unselectedItemColor: Colors.black,
@@ -210,9 +205,9 @@ class _HomeScreenState extends State<HomeScreen> {
               SendNotification().triggerRecording();
               break;
             case 2:
-              Navigator.push(context, PageTransition(child: VoiceCommand(), type: PageTransitionType.leftToRight,duration: Duration(milliseconds: 400)));
+              SendNotification().sendNotification(
+                  "Demo Notification", "For trial Purpose", ["670f3cd307565c85a58b096b"]);
               break;
-
           }
         },
       ),

@@ -35,6 +35,12 @@ class LoginApi {
         preferences.setString("avatar", body['data']['avatar']);
         preferences.setString("message", body['data']['message_template']);
 
+        // List<dynamic> communitiesDynamic = body['data']['communities']?? [];
+        List<String> communities = List<String>.from(body['data']['communities'] ?? []);
+        print("communities: $communities");
+        preferences.setStringList("communities", communities);
+        print("after that");
+
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => HomeScreen()));
       } else {
