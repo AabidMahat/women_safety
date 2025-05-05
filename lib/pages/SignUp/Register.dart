@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:phone_email_auth/phone_email_auth.dart';
 
 import '../../Database/Database.dart';
 import '../../api/loginApi.dart';
@@ -63,6 +64,8 @@ class _RegisterState extends State<Register> {
       });
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -227,7 +230,7 @@ class _RegisterState extends State<Register> {
                                 isLoading: isLoading,
                                 onPressed: isLoading
                                     ? null
-                                    : () {
+                                    : () async {
                                         if (_formKey.currentState!.validate()) {
                                           createAccount();
                                         }

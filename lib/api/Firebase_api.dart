@@ -51,7 +51,8 @@ class FirebaseApi {
       _videoRecordingService.handleVideoRecordingMessage(message);
     } else if (message.data['action'] == "audioRecording") {
       _videoRecordingService.handleAudioRecordingMessage(message);
-    } else if (message.notification!.title == "Call Notification") {
+    } else if (message.data['action'] == "emergency") {
+      print("It Came here");
       emergencyCallApi.cancelSMS();
     } else {
       navigatorKey.currentState?.pushNamed("/home");

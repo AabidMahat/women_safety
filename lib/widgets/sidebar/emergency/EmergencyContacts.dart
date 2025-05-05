@@ -140,14 +140,14 @@ class _EmergencyContactsState extends State<EmergencyContacts> {
     try {
       final response = await UserApi().getUser(widget.userId);
 
-
+      print(response);
 
       if (response['status'] == 'success') {
         setState(() {
           guardians =
               List<Map<String, dynamic>>.from(response['data']['guardian']);
           isLoading = false;
-          print(guardians); // Data loaded
+          print("Guardians :- " + guardians.toString()); // Data loaded
         });
       } else {
 

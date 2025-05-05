@@ -11,6 +11,7 @@ import 'package:women_safety/api/sendNotification.dart';
 import 'package:women_safety/pages/LogIn/Login.dart';
 import 'package:women_safety/pages/profile/profile.dart';
 import 'package:women_safety/pages/settings/messageTemplates.dart';
+import 'package:women_safety/utils/Procupine.dart';
 import 'package:women_safety/widgets/sidebar/emergency/EmergencyContacts.dart';
 
 class SideBarWidget extends StatefulWidget {
@@ -48,8 +49,9 @@ class _SideBarWidgetState extends State<SideBarWidget> {
       userId = preferences.getString("userId") ?? "";
       avatar = preferences.getString("avatar") ?? "";
     });
-  }
 
+    print("Avatar :_ " + preferences.getString("avatar")!);
+  }
 
   void logOut() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -68,9 +70,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
     print("Sidebar $staffAccess");
     return Scaffold(
       body: Container(
-          width: MediaQuery
-              .sizeOf(context)
-              .width,
+          width: MediaQuery.sizeOf(context).width,
           child: Drawer(
               backgroundColor: Colors.white,
               surfaceTintColor: Colors.white,
@@ -78,16 +78,14 @@ class _SideBarWidgetState extends State<SideBarWidget> {
               child: Align(
                 alignment: AlignmentDirectional(-1, -1),
                 child: Container(
-                  width: MediaQuery
-                      .sizeOf(context)
-                      .width,
+                  width: MediaQuery.sizeOf(context).width,
                   height: double.infinity,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     boxShadow: [
                       BoxShadow(
                         blurRadius: 0,
-                        color: Colors.blue,
+                        color: Colors.green.shade900,
                         offset: Offset(1, 0),
                       )
                     ],
@@ -109,10 +107,10 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                           child: Container(
                             width: double.infinity,
                             decoration: BoxDecoration(
-                              color: Colors.indigo[800],
+                              color: Colors.green[900],
                               boxShadow: [
                                 BoxShadow(
-                                  color: Color(0x4D9489F5),
+                                  color: Colors.green.shade900,
                                   offset: Offset(0, 1),
                                 )
                               ],
@@ -130,45 +128,44 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                         width: 95,
                                         height: 100,
                                         decoration: BoxDecoration(
-                                          color: Color(0x4D9489F5),
-                                          borderRadius: BorderRadius.circular(
-                                              12),
+                                          color: Colors.green.shade900,
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                           border: Border.all(
                                             color: Colors.green.shade900,
                                             width: 2,
                                           ),
                                         ),
                                         child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                              8),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
                                           child: avatar == null ||
-                                              avatar == "default.png"
+                                                  avatar == "default.png"
                                               ? Image.network(
-                                            'https://images.unsplash.com/photo-1624561172888-ac93c696e10c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NjJ8fHVzZXJzfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=900&q=60',
-                                            fit: BoxFit.cover,
-                                          )
+                                                  'https://images.unsplash.com/photo-1624561172888-ac93c696e10c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NjJ8fHVzZXJzfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=900&q=60',
+                                                  fit: BoxFit.cover,
+                                                )
                                               : Image.network(
-                                            avatar,
-                                            fit: BoxFit.cover,
-                                          ),
+                                                  avatar,
+                                                  fit: BoxFit.cover,
+                                                ),
                                         ),
                                       ),
-
                                       Expanded(
                                         child: Padding(
                                           padding:
-                                          EdgeInsetsDirectional.fromSTEB(
-                                              12, 0, 0, 0),
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  12, 0, 0, 0),
                                           child: Column(
                                             mainAxisSize: MainAxisSize.max,
                                             crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 '$name',
                                                 style: TextStyle(
                                                   fontFamily:
-                                                  'Plus Jakarta Sans',
+                                                      'Plus Jakarta Sans',
                                                   color: Colors.white,
                                                   fontSize: 18,
                                                   letterSpacing: 0,
@@ -182,7 +179,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                                   '$userPhone',
                                                   style: TextStyle(
                                                     fontFamily:
-                                                    'Plus Jakarta Sans',
+                                                        'Plus Jakarta Sans',
                                                     color: Color(0x9AFFFFFF),
                                                     fontSize: 14,
                                                     letterSpacing: 0,
@@ -192,7 +189,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                               ),
                                               Align(
                                                 alignment:
-                                                AlignmentDirectional(-1, 0),
+                                                    AlignmentDirectional(-1, 0),
                                                 child: Padding(
                                                   padding: EdgeInsetsDirectional
                                                       .fromSTEB(0, 29, 0, 0),
@@ -202,26 +199,26 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                                           context,
                                                           PageTransition(
                                                             child:
-                                                            ProfilePage(),
+                                                                ProfilePage(),
                                                             type:
-                                                            PageTransitionType
-                                                                .leftToRight,
+                                                                PageTransitionType
+                                                                    .leftToRight,
                                                             duration: Duration(
                                                                 milliseconds:
-                                                                400),
+                                                                    400),
                                                           ));
                                                     },
                                                     child: Text(
                                                       'Edit Profile',
                                                       style: TextStyle(
                                                         fontFamily:
-                                                        'Plus Jakarta Sans',
+                                                            'Plus Jakarta Sans',
                                                         color:
-                                                        Color(0x9AFFFFFF),
+                                                            Color(0x9AFFFFFF),
                                                         fontSize: 16,
                                                         letterSpacing: 0,
                                                         fontWeight:
-                                                        FontWeight.w500,
+                                                            FontWeight.w500,
                                                       ),
                                                     ),
                                                   ),
@@ -251,10 +248,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                 ));
                           },
                           child: Container(
-                            width: MediaQuery
-                                .of(context)
-                                .size
-                                .width,
+                            width: MediaQuery.of(context).size.width,
                             height: 72,
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -267,13 +261,13 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                             ),
                             child: Padding(
                               padding:
-                              EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
+                                  EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
                               child: Row(
                                 mainAxisSize: MainAxisSize.max,
                                 children: [
                                   Icon(
                                     Icons.person_pin_outlined,
-                                    color: Colors.indigo.shade900,
+                                    color: Colors.green.shade900,
                                     size: 28,
                                   ),
                                   Padding(
@@ -283,7 +277,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                       'My Emergency Contacts',
                                       style: TextStyle(
                                         fontFamily: 'Plus Jakarta Sans',
-                                        color: Colors.indigo.shade800,
+                                        color: Colors.green.shade800,
                                         fontSize: 17,
                                         letterSpacing: 0,
                                         fontWeight: FontWeight.w500,
@@ -296,10 +290,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                           ),
                         ),
                         Container(
-                          width: MediaQuery
-                              .of(context)
-                              .size
-                              .width,
+                          width: MediaQuery.of(context).size.width,
                           height: 72,
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -312,13 +303,13 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                           ),
                           child: Padding(
                             padding:
-                            EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
+                                EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
                                 Icon(
                                   CupertinoIcons.map_pin_ellipse,
-                                  color: Colors.indigo.shade800,
+                                  color: Colors.green.shade800,
                                   size: 28,
                                 ),
                                 Padding(
@@ -328,7 +319,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                     'Live location',
                                     style: TextStyle(
                                       fontFamily: 'Plus Jakarta Sans',
-                                      color: Colors.indigo.shade800,
+                                      color: Colors.green.shade800,
                                       fontSize: 17,
                                       letterSpacing: 0,
                                       fontWeight: FontWeight.w500,
@@ -356,13 +347,13 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                             ),
                             child: Padding(
                               padding:
-                              EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
+                                  EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
                               child: Row(
                                 mainAxisSize: MainAxisSize.max,
                                 children: [
                                   Icon(
                                     Icons.slow_motion_video_outlined,
-                                    color: Colors.indigo.shade800,
+                                    color: Colors.green.shade800,
                                     size: 26,
                                   ),
                                   Padding(
@@ -372,7 +363,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                       'Video Recording',
                                       style: TextStyle(
                                         fontFamily: 'Plus Jakarta Sans',
-                                        color: Colors.indigo.shade800,
+                                        color: Colors.green.shade800,
                                         fontSize: 17,
                                         letterSpacing: 0,
                                         fontWeight: FontWeight.w500,
@@ -385,70 +376,17 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                             ),
                           ),
                         ),
-                        Container(
-                          width: MediaQuery
-                              .of(context)
-                              .size
-                              .width,
-                          height: 72,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(0),
-                            shape: BoxShape.rectangle,
-                            border: Border.all(
-                              color: Color(0x84BDBDBD),
-                              width: 1,
-                            ),
-                          ),
-                          child: Padding(
-                            padding:
-                            EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              children: [
-                                Icon(
-                                  Icons.record_voice_over,
-                                  color: Colors.indigo.shade800,
-                                  size: 28,
-                                ),
-                                Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
-                                      12, 0, 0, 0),
-                                  child: Text(
-                                    'Voice Commands',
-                                    style: TextStyle(
-                                      fontFamily: 'Plus Jakarta Sans',
-                                      color: Colors.indigo.shade800,
-                                      fontSize: 17,
-                                      letterSpacing: 0,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
                         InkWell(
-                          onTap: widget.currentPosition != null
-                              ? () {
+                          onTap: () {
                             Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        FeedbackScreen(
-                                            currentPosition: LatLng(
-                                                widget.currentPosition!
-                                                    .latitude,
-                                                widget.currentPosition!
-                                                    .longitude))));
-                          }
-                              : null,
+                                PageTransition(
+                                    duration: Duration(milliseconds: 500),
+                                    type: PageTransitionType.leftToRight,
+                                    child: VoiceCommand()));
+                          },
                           child: Container(
-                            width: MediaQuery
-                                .of(context)
-                                .size
-                                .width,
+                            width: MediaQuery.of(context).size.width,
                             height: 72,
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -461,13 +399,69 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                             ),
                             child: Padding(
                               padding:
-                              EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
+                                  EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Icon(
+                                    Icons.record_voice_over,
+                                    color: Colors.green.shade800,
+                                    size: 28,
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        12, 0, 0, 0),
+                                    child: Text(
+                                      'Voice Commands',
+                                      style: TextStyle(
+                                        fontFamily: 'Plus Jakarta Sans',
+                                        color: Colors.green.shade800,
+                                        fontSize: 17,
+                                        letterSpacing: 0,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        InkWell(
+                          onTap: widget.currentPosition != null
+                              ? () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => FeedbackScreen(
+                                              currentPosition: LatLng(
+                                                  widget.currentPosition!
+                                                      .latitude,
+                                                  widget.currentPosition!
+                                                      .longitude))));
+                                }
+                              : null,
+                          child: Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: 72,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(0),
+                              shape: BoxShape.rectangle,
+                              border: Border.all(
+                                color: Color(0x84BDBDBD),
+                                width: 1,
+                              ),
+                            ),
+                            child: Padding(
+                              padding:
+                                  EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
                               child: Row(
                                 mainAxisSize: MainAxisSize.max,
                                 children: [
                                   Icon(
                                     Icons.feedback_outlined,
-                                    color: Colors.indigo.shade800,
+                                    color: Colors.green.shade800,
                                     size: 28,
                                   ),
                                   Padding(
@@ -477,7 +471,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                       'Feedbacks',
                                       style: TextStyle(
                                         fontFamily: 'Plus Jakarta Sans',
-                                        color: Colors.indigo.shade800,
+                                        color: Colors.green.shade800,
                                         fontSize: 17,
                                         letterSpacing: 0,
                                         fontWeight: FontWeight.w500,
@@ -500,16 +494,15 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                           },
                           child: InkWell(
                             onTap: () {
-                              Navigator.push(context, PageTransition(
-                                  child: MessageTemplate(),
-                                  type: PageTransitionType.leftToRight,
-                                  duration: Duration(milliseconds: 400)));
+                              Navigator.push(
+                                  context,
+                                  PageTransition(
+                                      child: MessageTemplate(),
+                                      type: PageTransitionType.leftToRight,
+                                      duration: Duration(milliseconds: 400)));
                             },
                             child: Container(
-                              width: MediaQuery
-                                  .of(context)
-                                  .size
-                                  .width,
+                              width: MediaQuery.of(context).size.width,
                               height: 72,
                               decoration: BoxDecoration(
                                 color: Colors.white,
@@ -521,14 +514,14 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                 ),
                               ),
                               child: Padding(
-                                padding:
-                                EdgeInsetsDirectional.fromSTEB(22, 0, 12, 0),
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                    22, 0, 12, 0),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
                                     Icon(
                                       Icons.settings,
-                                      color: Colors.indigo.shade800,
+                                      color: Colors.green.shade800,
                                       size: 28,
                                     ),
                                     Padding(
@@ -538,7 +531,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                         'Settings',
                                         style: TextStyle(
                                           fontFamily: 'Plus Jakarta Sans',
-                                          color: Colors.indigo.shade800,
+                                          color: Colors.green.shade800,
                                           fontSize: 17,
                                           letterSpacing: 0,
                                           fontWeight: FontWeight.w500,
@@ -554,7 +547,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                         Expanded(
                           child: Container(
                             padding:
-                            EdgeInsetsDirectional.fromSTEB(16, 0, 16, 16),
+                                EdgeInsetsDirectional.fromSTEB(16, 0, 16, 16),
                             child: Column(
                               mainAxisSize: MainAxisSize.max,
                               mainAxisAlignment: MainAxisAlignment.end,
@@ -569,11 +562,8 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                     children: [
                                       Container(
                                         width:
-                                        MediaQuery
-                                            .of(context)
-                                            .size
-                                            .width *
-                                            0.6,
+                                            MediaQuery.of(context).size.width *
+                                                0.6,
                                         child: Align(
                                           alignment: AlignmentDirectional(0, 0),
                                           child: ElevatedButton(
@@ -581,9 +571,9 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                               padding: EdgeInsets.zero,
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
-                                                BorderRadius.circular(24),
+                                                    BorderRadius.circular(24),
                                               ),
-                                              primary: Colors.indigo.shade800,
+                                              primary: Colors.green.shade800,
                                             ),
                                             onPressed: () {
                                               logOut();
@@ -593,7 +583,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                                   .fromSTEB(24, 0, 24, 0),
                                               child: Row(
                                                 mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                                    MainAxisAlignment.center,
                                                 children: [
                                                   // FaIcon(
                                                   //   Icons.logout_sharp,
@@ -605,11 +595,11 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                                     'Log Out',
                                                     style: TextStyle(
                                                       fontFamily:
-                                                      'Plus Jakarta Sans',
+                                                          'Plus Jakarta Sans',
                                                       color: Colors.white,
                                                       fontSize: 20,
                                                       fontWeight:
-                                                      FontWeight.w500,
+                                                          FontWeight.w500,
                                                     ),
                                                   ),
                                                 ],
@@ -628,7 +618,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       fontFamily: 'Readex Pro',
-                                      color: Colors.indigo.shade800,
+                                      color: Colors.green.shade800,
                                       letterSpacing: 0,
                                     ),
                                   ),

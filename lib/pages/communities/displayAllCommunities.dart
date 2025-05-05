@@ -91,11 +91,27 @@ class _ShowAllCommunitiesState extends State<ShowAllCommunities> {
             MaterialPageRoute(builder: (context) => CreateCommunityScreen()),
           );
         },
-        backgroundColor: Colors.green.shade900,
-        icon: const Icon(Icons.add),
-        label: const Text("Create"),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        backgroundColor: Colors.green.shade800,
+        foregroundColor: Colors.white,
+        elevation: 6,
+        icon: const Icon(Icons.add, size: 24),
+        label: const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8.0),
+          child: Text(
+            "Create Community",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+        ),
+        extendedPadding: const EdgeInsets.symmetric(horizontal: 20),
       ),
+
+
       body: isLoading
           ? Loader(context)
           : communities.isEmpty
@@ -104,6 +120,7 @@ class _ShowAllCommunitiesState extends State<ShowAllCommunities> {
         onRefresh: _refreshUserCommunities,
         child: ListView.builder(
           itemCount: communities.length,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           itemBuilder: (context, index) {
             final community = communities[index];
             return GestureDetector(
@@ -119,25 +136,27 @@ class _ShowAllCommunitiesState extends State<ShowAllCommunities> {
               },
               child: Container(
                 margin: const EdgeInsets.symmetric(vertical: 8),
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(18),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 6,
-                      offset: Offset(0, 3),
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
                 child: Row(
                   children: [
                     CircleAvatar(
-                      radius: 30,
+                      radius: 32,
+                      backgroundColor: Colors.grey.shade200,
                       backgroundImage: community.imageUrl == "default.png"
-                          ? NetworkImage("https://people.math.sc.edu/Burkardt/data/png/washington.png")
+                          ? const AssetImage("assets/default.png") as ImageProvider
                           : NetworkImage(community.imageUrl),
+
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -146,32 +165,38 @@ class _ShowAllCommunitiesState extends State<ShowAllCommunities> {
                         children: [
                           Text(
                             community.name,
-                            style: TextStyle(
+                            style: const TextStyle(
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              fontSize: 16,
                               color: Colors.black87,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 6),
                           Text(
                             community.description,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.grey.shade700,
+                              color: Colors.grey.shade600,
+                              height: 1.3,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey),
+                    const Icon(
+                      Icons.chevron_right_rounded,
+                      size: 28,
+                      color: Colors.grey,
+                    ),
                   ],
                 ),
               ),
             );
           },
-        ),
+        )
+        ,
       ),
     );
   }

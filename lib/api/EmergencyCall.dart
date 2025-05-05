@@ -18,13 +18,12 @@ class EmergencyCallApi {
   void startListening() {
     PhoneState.stream.listen((PhoneState state) {
       _callState = state.status;
-      print("*************************************************");
       phoneNumber = state.number;
 
       print("Phone Number $phoneNumber");
 
       if (_callState == PhoneStateStatus.CALL_STARTED) {
-        if (phoneNumber != null && phoneNumber!.startsWith('+18')) {
+        if (phoneNumber != null && phoneNumber!.startsWith('+17')) {
           Fluttertoast.showToast(msg: "Your Route is being monitored");
           isCallAnswered = false;
         }
@@ -36,7 +35,7 @@ class EmergencyCallApi {
       }
 
       if (_callState == PhoneStateStatus.CALL_INCOMING) {
-        if (phoneNumber != null && phoneNumber!.startsWith('+18')) {
+        if (phoneNumber != null && phoneNumber!.startsWith('+17')) {
           Fluttertoast.showToast(msg: "Incoming call from Japan");
           isCallAnswered = false; // Mark call as not answered yet
         }
@@ -46,11 +45,12 @@ class EmergencyCallApi {
 
   Future<void> _onCallEnd() async {
     if (!isCallAnswered) {
-      if (phoneNumber != null && phoneNumber!.startsWith('+18')) {
+      if (phoneNumber != null && phoneNumber!.startsWith('+17')) {
         sendNotification.sendNotification(
-            "Call Notification", "Tap to cancel SOS message (within 10 secs)",[]);
+            "Call Notification", "Tap to cancel SOS message (within 30 secs)");
 
-        smsTimer = Timer(Duration(seconds: 10), () {
+        smsTimer = Timer(Duration(seconds: 30), () {
+          print("Call recording triggered");
           sendSMS();
         });
       }

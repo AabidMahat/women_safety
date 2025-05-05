@@ -53,4 +53,38 @@ class TokenApi {
       return [];
     }
   }
+
+  Future<String> getTokenByPhoneNumber(String phoneNumber) async {
+    try {
+      String fcm_token = "";
+      String url = "${MAINURL}/api/v3/token/getTokenOnNumber";
+
+      if (phoneNumber.startsWith("+91")) {
+        phoneNumber = phoneNumber.replaceFirst("+91", "");
+      }
+
+      var body = {"phoneNumber": phoneNumber};
+
+      var response = await http.post(Uri.parse(url),
+          body: json.encode(body),
+          headers: {"Content-Type": "application/json"});
+
+      if(response.statusCode==200){
+        var data =  json.decode(response.body);
+
+        print(data['data']['fcm_token']);
+
+        fcm_token = data['data']['fcm_token'];
+
+        return fcm_token;
+      }
+      else{
+        return fcm_token;
+      }
+    } catch (err) {
+      print("Error while getting token $err");
+      return "";
+    }
+  }
+
 }

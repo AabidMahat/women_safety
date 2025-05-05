@@ -93,6 +93,7 @@ dependencies:
 
   #sppech to text
   speech_to_text:
+  phone_email_auth: ^0.0.4
 
 
 dev_dependencies:
