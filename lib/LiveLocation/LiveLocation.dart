@@ -32,7 +32,7 @@ class _LiveLocationState extends State<LiveLocation> {
   Location _locationController = new Location();
 
   final Completer<GoogleMapController> _mapController =
-      Completer<GoogleMapController>();
+  Completer<GoogleMapController>();
 
   LatLng? _currentPosition = null;
 
@@ -91,11 +91,11 @@ class _LiveLocationState extends State<LiveLocation> {
           if (distance > BUFFER_ZONE_RADIUS) {
             Fluttertoast.showToast(
                 msg:
-                    "you are out of buffer zone! you are ${distance} km away from the route.");
+                "you are out of buffer zone! you are ${distance} km away from the route.");
           } else {
             Fluttertoast.showToast(
                 msg:
-                    "you are inside buffer zone and ${distance} km away from the route.");
+                "you are inside buffer zone and ${distance} km away from the route.");
           }
         }
       }
@@ -104,27 +104,94 @@ class _LiveLocationState extends State<LiveLocation> {
 
   // function for generating buffer zones along the route
   void generateBufferZones(List<LatLng> polylineCoords) {
+    const double intervalMeters = 100.0; // distance between circles
     Set<Circle> bufferCircles = {};
     _circles.clear();
 
-    print("*(**************) $polylineCoords");
+    if (polylineCoords.length < 2) return;
 
-    for (LatLng point in polylineCoords) {
-      bufferCircles.add(Circle(
-        circleId: CircleId(point.toString()),
-        center: point,
-        radius: BUFFER_ZONE_RADIUS,
-        // Set the radius to your buffer zone
-        strokeColor: Colors.green.withOpacity(0.6),
-        strokeWidth: 2,
-        fillColor: Colors.green.withOpacity(0.6),
-      ));
+    double totalDistance = 0;
+    LatLng? lastAdded = polylineCoords.first;
+    bufferCircles.add(Circle(
+      circleId: CircleId(lastAdded.toString()),
+      center: lastAdded,
+      radius: BUFFER_ZONE_RADIUS,
+      strokeColor: Colors.green.withOpacity(0.6),
+      strokeWidth: 2,
+      fillColor: Colors.green.withOpacity(0.2),
+    ));
+
+    for (int i = 1; i < polylineCoords.length; i++) {
+      LatLng start = polylineCoords[i - 1];
+      LatLng end = polylineCoords[i];
+
+      double segmentDistance = calculateDistance(
+        start.latitude,
+        start.longitude,
+        end.latitude,
+        end.longitude,
+      ) *
+          1000; // convert to meters
+
+      double heading = getHeading(start, end);
+      double distanceCovered = 0;
+
+      while (distanceCovered + intervalMeters < segmentDistance) {
+        distanceCovered += intervalMeters;
+
+        LatLng intermediatePoint = computeOffset(start, distanceCovered, heading);
+
+        bufferCircles.add(Circle(
+          circleId: CircleId(intermediatePoint.toString()),
+          center: intermediatePoint,
+          radius: BUFFER_ZONE_RADIUS,
+          strokeColor: Colors.green.withOpacity(0.6),
+          strokeWidth: 2,
+          fillColor: Colors.green.withOpacity(0.2),
+        ));
+      }
     }
 
     setState(() {
-      _circles.addAll(bufferCircles); // Add buffer circles to the existing set
+      _circles.addAll(bufferCircles);
     });
   }
+
+  double getHeading(LatLng from, LatLng to) {
+    double fromLat = radians(from.latitude);
+    double fromLng = radians(from.longitude);
+    double toLat = radians(to.latitude);
+    double toLng = radians(to.longitude);
+    double dLng = toLng - fromLng;
+
+    double heading = atan2(
+      sin(dLng) * cos(toLat),
+      cos(fromLat) * sin(toLat) - sin(fromLat) * cos(toLat) * cos(dLng),
+    );
+    return degrees(heading);
+  }
+
+  LatLng computeOffset(LatLng from, double distanceMeters, double headingDegrees) {
+    double radius = 6371000; // Earth radius in meters
+    double distanceRatio = distanceMeters / radius;
+    double bearing = radians(headingDegrees);
+
+    double fromLat = radians(from.latitude);
+    double fromLng = radians(from.longitude);
+
+    double toLat = asin(sin(fromLat) * cos(distanceRatio) +
+        cos(fromLat) * sin(distanceRatio) * cos(bearing));
+    double toLng = fromLng +
+        atan2(
+            sin(bearing) * sin(distanceRatio) * cos(fromLat),
+            cos(distanceRatio) - sin(fromLat) * sin(toLat));
+
+    return LatLng(degrees(toLat), degrees(toLng));
+  }
+
+  double radians(double degrees) => degrees * pi / 180;
+  double degrees(double radians) => radians * 180 / pi;
+
 
 // helper funsction for calculating distance between two locations without any unnecsssary api call
   double calculateDistance(lat1, lon1, lat2, lon2) {
@@ -362,9 +429,9 @@ class _LiveLocationState extends State<LiveLocation> {
             // Once final location is set, generate the polyline route
             getLocationAndUpdate()
                 .then((_) => getRoutesWithAlternatives().then((routes) {
-                      displayRoutesOnMap(routes);
-                      generateBufferZones(routes[0]);
-                    }));
+              displayRoutesOnMap(routes);
+              generateBufferZones(routes[0]);
+            }));
 
             //   Fetch Distance and Time
 
@@ -375,7 +442,7 @@ class _LiveLocationState extends State<LiveLocation> {
                 _showDistanceAndTime(result['distance'], result['duration']);
                 Fluttertoast.showToast(
                     msg:
-                        "Distance: ${result['distance']} | Duration: ${result['duration']}");
+                    "Distance: ${result['distance']} | Duration: ${result['duration']}");
               } else {
                 Fluttertoast.showToast(msg: 'Failed to get distance and time');
               }
@@ -425,44 +492,44 @@ class _LiveLocationState extends State<LiveLocation> {
     return Scaffold(
       body: _currentPosition == null
           ? Center(
-              child: CircularProgressIndicator(
-                color: Colors.green.shade900,
-              ),
-            )
+        child: CircularProgressIndicator(
+          color: Colors.green.shade900,
+        ),
+      )
           : Stack(
-              children: [
-                // The Google Map
-                GoogleMap(
-                  onMapCreated: ((GoogleMapController controller) =>
-                      _mapController.complete(controller)),
-                  initialCameraPosition:
-                      CameraPosition(target: initialPosition, zoom: 15),
-                  markers: {
-                    Marker(
-                      markerId: MarkerId("initialLocation"),
-                      icon: BitmapDescriptor.defaultMarkerWithHue(
-                          BitmapDescriptor.hueYellow),
-                      position: initialPosition,
-                    ),
-                    Marker(
-                      markerId: MarkerId("finalLocation"),
-                      icon: BitmapDescriptor.defaultMarker,
-                      position: finalPosition,
-                    ),
-                  },
-                  polylines: Set<Polyline>.of(polylines.values),
-                  circles: _circles,
-                ),
+        children: [
+          // The Google Map
+          GoogleMap(
+            onMapCreated: ((GoogleMapController controller) =>
+                _mapController.complete(controller)),
+            initialCameraPosition:
+            CameraPosition(target: initialPosition, zoom: 15),
+            markers: {
+              Marker(
+                markerId: MarkerId("initialLocation"),
+                icon: BitmapDescriptor.defaultMarkerWithHue(
+                    BitmapDescriptor.hueYellow),
+                position: initialPosition,
+              ),
+              Marker(
+                markerId: MarkerId("finalLocation"),
+                icon: BitmapDescriptor.defaultMarker,
+                position: finalPosition,
+              ),
+            },
+            polylines: Set<Polyline>.of(polylines.values),
+            circles: _circles,
+          ),
 
-                // Position the search bar at the top
-                Positioned(
-                  top: 70.0, // Adjust the top position as needed
-                  left: 15.0,
-                  right: 15.0,
-                  child: _buildSearchbar(),
-                ),
-              ],
-            ),
+          // Position the search bar at the top
+          Positioned(
+            top: 70.0, // Adjust the top position as needed
+            left: 15.0,
+            right: 15.0,
+            child: _buildSearchbar(),
+          ),
+        ],
+      ),
     );
   }
 }
