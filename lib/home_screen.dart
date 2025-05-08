@@ -188,11 +188,11 @@ class _HomeScreenState extends State<HomeScreen> {
             // Set a fixed size
             label: 'Recording',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notification_add, size: 28),
-            // Set a fixed size
-            label: 'Notify',
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.notification_add, size: 28),
+          //   // Set a fixed size
+          //   label: 'Notify',
+          // ),
           BottomNavigationBarItem(
             icon: Icon(Icons.group_work_outlined, size: 28),
             // Set a fixed size
@@ -212,11 +212,10 @@ class _HomeScreenState extends State<HomeScreen> {
             case 1:
               SendNotification().triggerRecording();
               break;
+            // case 2:
+            //   EmergencyCallApi().makeCall("7559153594");
+            //   break;
             case 2:
-              SendNotification().sendNotification(
-                  "Demo Notification", "For trial Purpose", ["670f3cd307565c85a58b096b"]);
-              break;
-            case 3:
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => ShowAllCommunities()));
           }
@@ -224,4 +223,5 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
 }

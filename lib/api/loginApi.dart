@@ -26,7 +26,7 @@ class LoginApi {
       if (response.statusCode == 200) {
         Fluttertoast.showToast(msg: "Logged In successfully");
         var body = json.decode(response.body);
-        print(response.body);
+        print(body);
         SharedPreferences preferences = await SharedPreferences.getInstance();
         preferences.setString("userId", body['data']["_id"]);
         preferences.setString("phoneNumber", body['data']['phoneNumber']);
@@ -61,7 +61,7 @@ class LoginApi {
         "phoneNumber": user.phoneNumber,
         "password": user.password,
         "confirmPassword": user.confirmPassword,
-        "role": "guardian"
+        "role": "user"
       };
 
       var response = await http.post(Uri.parse(url),

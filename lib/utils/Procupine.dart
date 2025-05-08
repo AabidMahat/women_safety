@@ -3,11 +3,14 @@ import 'package:background_sms/background_sms.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:porcupine_flutter/porcupine_error.dart';
 import 'package:porcupine_flutter/porcupine_manager.dart';
 import 'package:women_safety/api/Permission.dart';
+import 'package:women_safety/widgets/customAppBar.dart';
 
 import '../consts/AppConts.dart';
+import '../home_screen.dart';
 
 
 class VoiceCommand extends StatefulWidget {
@@ -145,44 +148,128 @@ class _VoiceCommandState extends State<VoiceCommand> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.red.shade900,
-        title: Text(
-          "Voice Command",
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
-      body: Center(
-        child: Column(
-          children: [
-            Container(
-              padding: EdgeInsets.all(10),
-              child: Text(
-                'Porcupine is listening...',
-                style: TextStyle(fontSize: 20),
+    backgroundColor: Colors.white,
+    appBar: customAppBar(
+      "Voice Command",
+      leadingIcon: Icons.arrow_back,
+      backgroundColor: Colors.green.shade900,
+      textColor: Colors.white,
+      onPressed: () {
+        Navigator.pushReplacement(
+          context,
+          PageTransition(
+            child: HomeScreen(),
+            type: PageTransitionType.rightToLeft,
+            duration: const Duration(milliseconds: 400),
+          ),
+        );
+      },
+    ),
+    body: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Spacer(),
+
+          // Mic inside a circular background
+          Container(
+            padding: EdgeInsets.all(25),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.green.shade100,
+            ),
+            child: Icon(
+              Icons.mic_rounded,
+              size: 80,
+              color: Colors.green.shade800,
+            ),
+          ),
+
+          SizedBox(height: 30),
+
+          // Listening Text
+          Text(
+            'Listening...',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: Colors.green.shade900,
+            ),
+          ),
+
+          SizedBox(height: 10),
+
+          // Instruction
+          Text(
+            'Speak your command clearly',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey.shade600,
+            ),
+          ),
+
+          Spacer(),
+
+          // Words Spoken Output
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.green.shade50,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Text(
+              _wordsSpoken.isEmpty ? "Waiting for your voice..." : _wordsSpoken,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: Colors.black87,
               ),
             ),
-            Expanded(
-              child: Container(
-                padding: EdgeInsets.all(10),
-                child: Text(_wordsSpoken),
+          ),
+
+          SizedBox(height: 20),
+
+          // Confidence Indicator
+          if (_confidenceLevel > 0) ...[
+            Text(
+              'Confidence: ${(_confidenceLevel * 100).toStringAsFixed(1)}%',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.green.shade800,
               ),
             ),
-            if (_confidenceLevel > 0)
-              Text(
-                "Confidence: ${(_confidenceLevel * 100).toStringAsFixed(1)}%",
-              ),
+            SizedBox(height: 8),
+            LinearProgressIndicator(
+              value: _confidenceLevel,
+              backgroundColor: Colors.green.shade100,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.green.shade700),
+              minHeight: 8,
+              borderRadius: BorderRadius.circular(10),
+            ),
           ],
-        ),
+
+          Spacer(),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: (){
-          setState(() {
-            _isRinging = false;
-          });
-        },
-        child: Icon(Icons.volume_mute,color: Colors.black,),
+    ),
+    floatingActionButton: FloatingActionButton.extended(
+      onPressed: () {
+        setState(() {
+          _isRinging = false;
+        });
+      },
+      backgroundColor: Colors.redAccent,
+      icon: Icon(Icons.volume_off, color: Colors.white),
+      label: Text(
+        'Mute',
+        style: TextStyle(color: Colors.white),
       ),
+    ),
     );
+
+
   }
 }

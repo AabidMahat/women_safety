@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:women_safety/Database/Database.dart';
 import 'package:women_safety/api/communityApi.dart';
 import 'package:women_safety/api/postsApi.dart';
 import 'package:women_safety/pages/posts/CreatePostPage.dart';
 import 'package:women_safety/pages/posts/postDetailPage.dart';
+import 'package:women_safety/utils/loader.dart';
+import 'package:women_safety/widgets/Button/ResuableButton.dart';
+import 'package:women_safety/widgets/customAppBar.dart';
+
+import '../../home_screen.dart';
 
 class CommunityHomePage extends StatefulWidget {
   final Community community;
+
   const CommunityHomePage({super.key, required this.community});
 
   @override
@@ -47,8 +55,7 @@ class _CommunityHomePageState extends State<CommunityHomePage> {
 
   void isMember() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> joinedCommunities =
-        prefs.getStringList("communities") ?? [];
+    List<String> joinedCommunities = prefs.getStringList("communities") ?? [];
     setState(() {
       isJoined = joinedCommunities.contains(widget.community.id);
     });
@@ -59,8 +66,7 @@ class _CommunityHomePageState extends State<CommunityHomePage> {
 
     setState(() => joinButtonLoading = true);
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> joinedCommunities =
-        prefs.getStringList("communities") ?? [];
+    List<String> joinedCommunities = prefs.getStringList("communities") ?? [];
 
     if (isJoined) {
       toggle = await communityApi.leaveCommunity(widget.community.id);
@@ -102,71 +108,133 @@ class _CommunityHomePageState extends State<CommunityHomePage> {
     final community = widget.community;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(community.name),
+      appBar: customAppBar(
+        community.name,
         backgroundColor: Colors.green.shade900,
-        elevation: 4,
+        textColor: Colors.white,
+        leadingIcon: Icons.arrow_back,
+        onPressed: () {
+          Navigator.pop(
+            context,
+            PageTransition(
+              child: HomeScreen(),
+              type: PageTransitionType.rightToLeft,
+              duration: const Duration(milliseconds: 1000),
+            ),
+          );
+        },
       ),
       body: SingleChildScrollView(
         controller: _scrollController,
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(10.0),
         child: Column(
           children: [
             // Community Info Card
             Card(
+              margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 12),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-              elevation: 4,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              color: Colors.white,
+              surfaceTintColor: Colors.white,
+              elevation: 8,
+              shadowColor: Colors.black26,
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundImage: community.imageUrl == "default.png"
-                          ? NetworkImage(
-                          "https://cdn.pixabay.com/photo/2020/06/06/19/23/lgbt-5267848_1280.png")
-                      as ImageProvider
-                          : NetworkImage(community.imageUrl),
+                    Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundColor: Colors.grey.shade100,
+                          backgroundImage: community.imageUrl == "default.png"
+                              ? const AssetImage('assets/default.png')
+                                  as ImageProvider
+                              : NetworkImage(community.imageUrl),
+                        ),
+                        if (isJoined)
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.green.shade700,
+                                shape: BoxShape.circle,
+                                border:
+                                    Border.all(color: Colors.white, width: 2),
+                              ),
+                              padding: const EdgeInsets.all(4),
+                              child: const Icon(Icons.check,
+                                  size: 18, color: Colors.white),
+                            ),
+                          ),
+                      ],
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 16),
                     Text(
                       community.name,
+                      textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 22,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
                       ),
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      '${community.memberCount} members',
-                      style: TextStyle(color: Colors.grey[600]),
-                    ),
-                    const SizedBox(height: 16),
-                    joinButtonLoading
-                        ? const CircularProgressIndicator()
-                        : ElevatedButton.icon(
-                      icon: Icon(
-                          isJoined ? Icons.logout : Icons.group_add),
-                      onPressed: toggleJoinStatus,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                        isJoined ? Colors.grey : Colors.green.shade700,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 12),
+                      '${community.memberCount} Members',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
                       ),
-                      label: Text(isJoined ? 'Leave Community' : 'Join Community'),
                     ),
-                    const SizedBox(height: 16),
-                    Align(
-                      alignment: Alignment.centerLeft,
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: toggleJoinStatus,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isJoined
+                              ? Colors.grey.shade400
+                              : Colors.green.shade700,
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          isJoined ? "Leave Community" : "Join Community",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      margin: const EdgeInsets.only(top: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       child: Text(
                         community.description,
-                        style: const TextStyle(fontSize: 16),
+                        style: TextStyle(
+                          fontSize: 16,
+                          height: 1.8,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.grey.shade800,
+                          letterSpacing: 0.2,
+                        ),
                       ),
-                    ),
+                    )
                   ],
                 ),
               ),
@@ -176,20 +244,12 @@ class _CommunityHomePageState extends State<CommunityHomePage> {
             // Create Post Button
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton.icon(
-                icon: const Icon(Icons.edit),
-                label: const Text("Create Post"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
+              child: AdvanceButton(
+                buttonText: "Create Post",
+                backgroundColor: Colors.green.shade900,
                 onPressed: () async {
                   SharedPreferences prefs =
-                  await SharedPreferences.getInstance();
+                      await SharedPreferences.getInstance();
                   String? userId = prefs.getString("userId");
 
                   if (userId != null) {
@@ -211,96 +271,157 @@ class _CommunityHomePageState extends State<CommunityHomePage> {
               ),
             ),
 
-            const SizedBox(height: 32),
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Community Posts",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+              child: Row(
+                children: [
+                  Icon(Icons.forum_rounded,
+                      color: Colors.green.shade700, size: 24),
+                  const SizedBox(width: 8),
+                  Text(
+                    "Community Posts",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey.shade800,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
               ),
             ),
+
             const SizedBox(height: 16),
 
             // Posts
             if (posts.isEmpty && !isLoadingPosts)
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 32),
+                padding: const EdgeInsets.symmetric(vertical: 48),
                 child: Column(
-                  children: const [
-                    Icon(Icons.forum, size: 48, color: Colors.grey),
-                    SizedBox(height: 8),
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.forum_rounded,
+                        size: 64, color: Colors.grey.shade400),
+                    const SizedBox(height: 16),
                     Text(
-                      "No posts in this community yet.",
-                      style: TextStyle(color: Colors.grey),
+                      "No posts in this community yet!",
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.5,
+                      ),
                     ),
                   ],
                 ),
               ),
-            ...posts.map(
-                  (post) => Card(
-                elevation: 3,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PostDetailsPage(post: post),
-                      ),
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          post.title,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
+            ...posts.map((post) => Card(
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                  elevation: 3,
+                  surfaceTintColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  shadowColor: Colors.black,
+                  color: Colors.white,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PostDetailsPage(post: post),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          post.description,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 8),
-                        if (post.images.isNotEmpty)
-                          SizedBox(
-                            height: 150,
-                            child: ListView.separated(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: post.images.length,
-                              separatorBuilder: (_, __) => const SizedBox(width: 8),
-                              itemBuilder: (context, index) {
-                                return ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: Image.network(
-                                    post.images[index],
-                                    width: 200,
-                                    height: 150,
-                                    fit: BoxFit.cover,
-                                  ),
-                                );
-                              },
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Post title
+                          Text(
+                            post.title,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 20,
+                              color: Colors.black87,
+                              letterSpacing: 0.3,
                             ),
                           ),
-                      ],
+                          const SizedBox(height: 8),
+
+                          // Post description
+                          Text(
+                            post.description,
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 15,
+                              height: 1.6,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+
+                          if (post.images.isNotEmpty) ...[
+                            const SizedBox(height: 16),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: SizedBox(
+                                height: 180,
+                                child: ListView.separated(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: post.images.length,
+                                  separatorBuilder: (_, __) =>
+                                      const SizedBox(width: 12),
+                                  itemBuilder: (context, index) {
+                                    return Container(
+                                      width: 240,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        color: Colors.grey.shade200,
+                                        image: DecorationImage(
+                                          image:
+                                              NetworkImage(post.images[index]),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+
+                          const SizedBox(height: 16),
+
+                          // Bottom small post time or extra info
+                          Row(
+                            children: [
+                              Icon(Icons.access_time,
+                                  size: 16, color: Colors.grey.shade500),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Posted on ${DateFormat('dd MMM yyyy').format(community.createdAt)}',
+                                // Make sure post.createdAt is formatted
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey.shade500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ),
-            ),
+                )),
+
             if (isLoadingPosts)
-              const Padding(
+              Padding(
                 padding: EdgeInsets.all(16.0),
-                child: Center(child: CircularProgressIndicator()),
+                child: Loader(context),
               ),
           ],
         ),

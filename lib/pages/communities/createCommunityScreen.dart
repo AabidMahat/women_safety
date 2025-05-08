@@ -6,6 +6,10 @@ import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:women_safety/api/communityApi.dart';
 import 'package:women_safety/home_screen.dart';
+import 'package:women_safety/utils/loader.dart';
+import 'package:women_safety/widgets/Button/ResuableButton.dart';
+import 'package:women_safety/widgets/TextField/TestArea.dart';
+import 'package:women_safety/widgets/TextField/TextField.dart';
 import 'package:women_safety/widgets/customAppBar.dart';
 import 'package:path/path.dart' as path;
 
@@ -28,12 +32,16 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen> {
     String? userId = prefs.getString("userId");
 
     if (userId == null || userId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("User ID not found")));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("User ID not found")));
       return;
     }
 
-    if (_nameController.text.isEmpty || _descriptionController.text.isEmpty || _imageUrl == null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please fill all fields and upload an image")));
+    if (_nameController.text.isEmpty ||
+        _descriptionController.text.isEmpty ||
+        _imageUrl == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Please fill all fields and upload an image")));
       return;
     }
 
@@ -49,7 +57,8 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen> {
 
       await communityApi.createCommunity(userId, communityData);
 
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Community Created Successfully")));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Community Created Successfully")));
 
       // Optional: Clear form
       _nameController.clear();
@@ -70,13 +79,15 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen> {
       );
     } catch (err) {
       setState(() => isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: ${err.toString()}")));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Error: ${err.toString()}")));
     }
   }
 
   Future<void> pickImage() async {
     print("picking the image");
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() => _imageFile = File(pickedFile.path));
       await uploadImageToFirebase();
@@ -88,7 +99,8 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen> {
       if (_imageFile == null) return;
 
       final fileName = path.basename(_imageFile!.path);
-      final storageRef = FirebaseStorage.instance.ref().child('community_images/$fileName');
+      final storageRef =
+          FirebaseStorage.instance.ref().child('community_images/$fileName');
       final uploadTask = storageRef.putFile(_imageFile!);
       final snapshot = await uploadTask;
       final downloadUrl = await snapshot.ref.getDownloadURL();
@@ -96,7 +108,8 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen> {
       print("image url: $downloadUrl");
       setState(() => _imageUrl = downloadUrl);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Image upload failed: ${e.toString()}")));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Image upload failed: ${e.toString()}")));
     }
   }
 
@@ -131,11 +144,12 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen> {
                   height: 180,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.withOpacity(0.5)),
-                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.grey.shade100, // Light background color for empty state
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.grey.shade300, width: 1.2),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black26,
+                        color: Colors.black12,
                         offset: Offset(0, 4),
                         blurRadius: 8,
                       ),
@@ -143,49 +157,50 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen> {
                   ),
                   child: _imageFile != null
                       ? ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.file(_imageFile!, fit: BoxFit.cover),
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.file(
+                      _imageFile!,
+                      fit: BoxFit.cover,
+                    ),
                   )
-                      : Center(child: Icon(Icons.add_a_photo, color: Colors.grey, size: 40)),
-                ),
-              ),
-              SizedBox(height: 20),
-              Text("Community Name", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-              TextField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  hintText: "Enter community name",
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                  contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-                ),
-              ),
-              SizedBox(height: 20),
-              Text("Description", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-              TextField(
-                controller: _descriptionController,
-                decoration: InputDecoration(
-                  hintText: "Enter community description",
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                  contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-                ),
-                maxLines: 4,
-              ),
-              SizedBox(height: 30),
-              isLoading
-                  ? Center(child: CircularProgressIndicator())
-                  : SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: createCommunity,
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.green.shade900,
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.add_a_photo, size: 40, color: Colors.grey.shade600),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Tap to upload image',
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
                   ),
-                  child: Text("Create Community", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 ),
               ),
+
               SizedBox(height: 20),
+              AdvanceTextField(
+                  controller: _nameController,
+                  type: TextInputType.text,
+                  label: 'Community Name'),
+
+
+
+              AdvanceTextArea(controller: _descriptionController, label: "Community Description"),
+
+              isLoading
+                  ? Loader(context)
+                  : SizedBox(
+                      width: double.infinity,
+                      child: AdvanceButton(
+                        onPressed: createCommunity,
+                        buttonText: "Create Community",
+                        backgroundColor: Colors.green.shade900,
+
+                      ),
+                    ),
             ],
           ),
         ),
