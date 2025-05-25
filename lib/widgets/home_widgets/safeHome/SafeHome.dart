@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:women_safety/LiveLocation/LiveLocation.dart';
-import 'package:women_safety/api/sendNotification.dart';
+import 'package:women_safety/api/sendNotificationApi.dart';
 import 'package:women_safety/utils/SmsTemplate.dart';
 import 'package:women_safety/widgets/makeCallConfirmation.dart';
 

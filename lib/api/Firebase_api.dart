@@ -26,7 +26,7 @@ class FirebaseApi {
   // Instance of Firebase Messaging
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   EmergencyCallApi emergencyCallApi = EmergencyCallApi();
-  String? FIREBASE_TOKEN;
+  // String? FIREBASE_TOKEN;
 
   final FirebaseStorage _storage = FirebaseStorage.instance;
 

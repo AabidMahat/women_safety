@@ -52,10 +52,10 @@ dependencies:
 
   #    Firebase
   firebase_core: ^2.27.0
-  firebase_messaging:
+  firebase_messaging: ^14.7.19
   firebase_analytics:
   cloud_firestore:
-  firebase_storage:
+  firebase_storage: ^11.6.9
   flutter_local_notifications:
 
   #  Splash Screen

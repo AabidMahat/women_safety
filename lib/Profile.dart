@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:women_safety/Database/Database.dart';
 import 'package:women_safety/FeedBack/FeedBackMap.dart';
 import 'package:women_safety/api/User.dart';
-import 'package:women_safety/api/sendNotification.dart';
+import 'package:women_safety/api/sendNotificationApi.dart';
 import 'package:women_safety/pages/LogIn/Login.dart';
 import 'package:women_safety/pages/profile/profile.dart';
 import 'package:women_safety/pages/settings/messageTemplates.dart';

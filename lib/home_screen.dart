@@ -8,7 +8,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:women_safety/api/EmergencyCall.dart';
 import 'package:women_safety/api/Permission.dart';
-import 'package:women_safety/api/sendNotification.dart';
+import 'package:women_safety/api/sendNotificationApi.dart';
 import 'package:women_safety/pages/communities/displayAllCommunities.dart';
 import 'package:women_safety/pages/videos/DisplayAllVideos.dart';
 import 'package:women_safety/pages/DisplayAudios.dart';

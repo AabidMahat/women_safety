@@ -4,7 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:phone_state/phone_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:women_safety/api/sendNotification.dart';
+import 'package:women_safety/api/sendNotificationApi.dart';
 import 'package:women_safety/consts/AppConts.dart';
 import 'package:women_safety/utils/SmsTemplate.dart';
 

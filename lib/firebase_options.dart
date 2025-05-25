@@ -17,19 +17,13 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for macos - '
@@ -53,10 +47,30 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCVDCHZ07YdruNZb_yDY0AbDGdyrM3sPac',
-    appId: '1:515838664309:android:26d1df0b7a4045a692a23c',
-    messagingSenderId: '515838664309',
-    projectId: 'women-safety-fa8e0',
-    storageBucket: 'women-safety-fa8e0.appspot.com',
+    apiKey: 'AIzaSyBIyzKcwMw4rykozIee3WCNaCK7oIqiHcg',
+    appId: '1:781714504024:android:9baf55bc37ad0da9af4d2d',
+    messagingSenderId: '781714504024',
+    projectId: 'safesarthi',
+    storageBucket: 'safesarthi.firebasestorage.app',
   );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyAATCmDb0N8e1D73LE6I7pYqtAw1go-dRE',
+    appId: '1:781714504024:web:0350e404ff69f0d2af4d2d',
+    messagingSenderId: '781714504024',
+    projectId: 'safesarthi',
+    authDomain: 'safesarthi.firebaseapp.com',
+    storageBucket: 'safesarthi.firebasestorage.app',
+    measurementId: 'G-GW3TY7Z5BM',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyBA6UpbkHM6E9ffRmPe0FWqwqicaYN_whs',
+    appId: '1:781714504024:ios:5bb506438e3007e5af4d2d',
+    messagingSenderId: '781714504024',
+    projectId: 'safesarthi',
+    storageBucket: 'safesarthi.firebasestorage.app',
+    iosBundleId: 'com.example.womenSafety',
+  );
+
 }

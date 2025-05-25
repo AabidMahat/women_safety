@@ -47,6 +47,8 @@ class AudioRecordingService {
     } else {
       Fluttertoast.showToast(msg: "Recording file not found!");
     }
+
+    await disposeRecorder();
   }
 
   Future<void> disposeRecorder() async {
