@@ -16,8 +16,17 @@ class UserApi {
   Future<List<UserData>> getUsers() async {
     try {
       final String url = "${MAINURL}/api/v3/user/getAllUsers";
+      SharedPreferences preferences = await SharedPreferences.getInstance();
 
-      var response = await http.post(Uri.parse(url));
+      var token = preferences.getString("jwtToken");
+
+      var response = await http.post(
+          Uri.parse(url),
+        headers:{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        }
+      );
       print("Response status code: ${response.statusCode}");
 
       if (response.statusCode == 200) {
@@ -53,8 +62,20 @@ class UserApi {
         "$MAINURL/api/v3/user/getUser/$userId"; // URL to fetch the user data
     print("Fetching user with ID: $userId");
 
+
+
     try {
-      var response = await http.get(Uri.parse(url));
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+
+      var token = preferences.getString("jwtToken");
+
+      var response = await http.post(
+          Uri.parse(url),
+          headers:{
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          }
+      );
 
       if (response.statusCode == 200) {
         var body = json.decode(response.body);
@@ -81,7 +102,17 @@ class UserApi {
     print("Fetching user with ID: $userId");
 
     try {
-      final response = await http.get(Uri.parse(url));
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+
+      var token = preferences.getString("jwtToken");
+
+      var response = await http.post(
+          Uri.parse(url),
+          headers:{
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          }
+      );
 
       if (response.statusCode == 200) {
         final body = json.decode(response.body);
@@ -104,11 +135,19 @@ class UserApi {
   }
 
   Future<List<String>> getGuardianName(List<String> guardianIds) async {
+
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+
+    var token = preferences.getString("jwtToken");
+
     try {
       final String url = "${MAINURL}/api/v3/guardian/getGuardians";
       var response = await http.post(
         Uri.parse(url),
-        headers: {"Content-Type": "application/json"},
+        headers:{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
         body: json.encode({"guardianIds": guardianIds}),
       );
 
@@ -139,11 +178,17 @@ class UserApi {
     try {
       SharedPreferences preferences = await SharedPreferences.getInstance();
       String? userId = preferences.getString("userId");
+
+      var token = preferences.getString("jwtToken");
+
       final String url = "${MAINURL}/api/v3/user/addAudioAndVideo/${userId}";
 
       var response = await http.patch(Uri.parse(url),
           body: json.encode(data),
-          headers: {"Content-Type": "application/json"});
+          headers:{
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          });
 
       if (response.statusCode == 200) {
         Fluttertoast.showToast(msg: "Data Added");
@@ -160,7 +205,17 @@ class UserApi {
     try {
       String url = "$MAINURL/api/v3/user/getUser/$userId";
 
-      final response = await http.get(Uri.parse(url));
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+
+      var token = preferences.getString("jwtToken");
+
+      var response = await http.post(
+          Uri.parse(url),
+          headers:{
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          }
+      );
 
       print("Response details ${response.statusCode}");
 
@@ -182,12 +237,16 @@ class UserApi {
       SharedPreferences preferences = await SharedPreferences.getInstance();
       String? phoneNumber = preferences.getString("phoneNumber");
       String url = "$MAINURL/api/v3/user/gurdianWithPhoneNUmber";
+      var token = preferences.getString("jwtToken");
 
       var body = {"phoneNumber": phoneNumber};
 
       var response = await http.post(Uri.parse(url),
           body: json.encode(body),
-          headers: {"Content-Type": "application/json"});
+          headers:{
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          });
 
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
@@ -210,9 +269,16 @@ class UserApi {
   Future<List<String>> getUserName(List<String> userId) async {
     try {
       final String url = "${MAINURL}/api/v3/user/getUsers";
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+
+      var token = preferences.getString("jwtToken");
+
       var response = await http.post(Uri.parse(url),
           body: json.encode({"userId": userId}),
-          headers: {"Content-Type": "application/json"});
+          headers:{
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          });
 
       if (response.statusCode == 200) {
         var body = json.decode(response.body);
@@ -270,9 +336,15 @@ class UserApi {
   // Method to delete a user
   Future<void> deleteUser(String userId, BuildContext context) async {
     String url = "$MAINURL/api/v3/user/deleteUser/$userId";
+
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+
+    var token = preferences.getString("jwtToken");
+
     try {
-      var response = await http.delete(Uri.parse(url), headers: {
-        "Content-Type": "application/json",
+      var response = await http.delete(Uri.parse(url), headers:{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
       });
 
       if (response.statusCode == 200) {
@@ -298,13 +370,20 @@ class UserApi {
     print("UserID is: $userId");
     print("Guardian Data: $guardianData");
 
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+
+    var token = preferences.getString("jwtToken");
+
     try {
       var response = await http.patch(
         Uri.parse(url),
         body: json.encode({
           "guardian": guardianData['guardian'],
         }),
-        headers: {"Content-Type": "application/json"},
+        headers:{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
       );
 
       if (response.statusCode == 200) {
@@ -339,12 +418,21 @@ class UserApi {
   Future<List<String>> getGuardianNumber(String userId) async {
     try {
       String url = "${MAINURL}/api/v3/user/allGuardianNumber";
+
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+
+      var token = preferences.getString("jwtToken");
+
+
       List<String> numbers = [];
       var body = {"userId": userId};
 
       var response = await http.post(Uri.parse(url),
           body: json.encode(body),
-          headers: {"Content-Type": "application/json"});
+          headers:{
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          });
 
       if (response.statusCode == 200) {
         var data = json.decode(response.body);

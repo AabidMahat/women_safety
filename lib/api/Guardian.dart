@@ -7,7 +7,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:women_safety/Database/Database.dart';
 import 'package:women_safety/api/Firebase_api.dart';
 import 'package:women_safety/pages/profile/profile.dart';
-
 import '../consts/AppConts.dart';
 import 'package:http/http.dart' as http;
 
@@ -19,21 +18,28 @@ class GuardianApi {
     try {
       SharedPreferences preferences = await SharedPreferences.getInstance();
       final userId = preferences.getString("userId");
+      final token = preferences.getString("jwtToken");
 
       print("Guardian Api $userId");
 
-      final String url = "${MAINURL}/api/v3/guardian/fetchGuardian/${userId}";
+      final String url = "$MAINURL/api/v3/guardian/fetchGuardian/$userId";
 
-      var response = await http.get(Uri.parse(url));
+      var response = await http.get(
+        Uri.parse(url),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token"
+        },
+      );
+
       print("Response status code: ${response.statusCode}");
 
       if (response.statusCode == 200) {
         var body = json.decode(response.body);
         var guardianData = body['data'];
 
-        print("guardian ${guardianData}");
+        print("guardian $guardianData");
         guardian = Guardian.fromJson(guardianData);
-
         return guardian;
       } else {
         Fluttertoast.showToast(msg: "Error: Unexpected data format");
@@ -50,26 +56,33 @@ class GuardianApi {
     try {
       SharedPreferences preferences = await SharedPreferences.getInstance();
       String? userId = preferences.getString("userId");
+      String? token = preferences.getString("jwtToken");
 
-
-      print("UserIds ${assignedUserId}");
+      print("UserIds $assignedUserId");
 
       String url = "$MAINURL/api/v3/guardian/updateUserList/$userId";
 
       var body = {"userId": assignedUserId};
-      var response = await http.patch(Uri.parse(url),
-          body: json.encode(body),
-          headers: {"Content-Type": "application/json"});
+      var response = await http.patch(
+        Uri.parse(url),
+        body: json.encode(body),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token"
+        },
+      );
 
       if (response.statusCode == 200) {
-        Fluttertoast.showToast(msg: "Update sucessful");
+        Fluttertoast.showToast(msg: "Update successful");
         Navigator.pushReplacement(
-            context,
-            PageTransition(
-                child: ProfilePage(),
-                type: PageTransitionType.rightToLeft,
-                duration: Duration(milliseconds: 400)));
-      }else{
+          context,
+          PageTransition(
+            child: ProfilePage(),
+            type: PageTransitionType.rightToLeft,
+            duration: Duration(milliseconds: 400),
+          ),
+        );
+      } else {
         var data = json.decode(response.body);
         print("Error while updating data ${data['message']}");
       }
@@ -82,29 +95,36 @@ class GuardianApi {
     try {
       SharedPreferences preferences = await SharedPreferences.getInstance();
       final userId = preferences.getString("userId");
+      final token = preferences.getString("jwtToken");
 
-      final String url = "${MAINURL}/api/v3/guardian/updateGuardian/${userId}";
+      final String url = "$MAINURL/api/v3/guardian/updateGuardian/$userId";
 
-      var response = await http.patch(Uri.parse(url),
-          body: json.encode(updateBody),
-          headers: {"Content-Type": "application/json"});
+      var response = await http.patch(
+        Uri.parse(url),
+        body: json.encode(updateBody),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token"
+        },
+      );
 
       if (response.statusCode == 200) {
         Fluttertoast.showToast(msg: "Guardian updated Successfully");
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => ProfilePage()));
+          context,
+          MaterialPageRoute(builder: (context) => ProfilePage()),
+        );
       } else {
         Fluttertoast.showToast(msg: "Error: Unexpected data format");
       }
     } catch (err) {
       print("Exception occurred: $err");
-      Fluttertoast.showToast(msg: "Error fetching users: $err");
+      Fluttertoast.showToast(msg: "Error updating guardian: $err");
     }
   }
 
   Future<String> pickAndUploadImage() async {
     final ImagePicker _picker = ImagePicker();
-
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {

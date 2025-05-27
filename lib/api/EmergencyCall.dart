@@ -10,7 +10,7 @@ import 'package:women_safety/utils/SmsTemplate.dart';
 
 class EmergencyCallApi {
   PhoneStateStatus? _callState;
-  bool isCallAnswered = false; // Track if the call was answered
+  bool isCallAnswered = false;
   SendNotification sendNotification = SendNotification();
   Timer? smsTimer;
   String? phoneNumber;
@@ -37,7 +37,7 @@ class EmergencyCallApi {
       if (_callState == PhoneStateStatus.CALL_INCOMING) {
         if (phoneNumber != null && phoneNumber!.startsWith('+17')) {
           Fluttertoast.showToast(msg: "Incoming call from Japan");
-          isCallAnswered = false; // Mark call as not answered yet
+          isCallAnswered = false;
         }
       }
     });
@@ -59,7 +59,6 @@ class EmergencyCallApi {
     }
   }
 
-  // Method to cancel the SMS
   void cancelSMS() {
     if (smsTimer != null && smsTimer!.isActive) {
       smsTimer!.cancel();
@@ -68,13 +67,21 @@ class EmergencyCallApi {
   }
 
   Future<void> makeCall(String phoneNumber) async {
-    final String url = "${MAINURL}/api/v3/notification/makeCall";
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? token = prefs.getString("jwtToken");
+
+    final String url = "$MAINURL/api/v3/notification/makeCall";
     try {
       var callBody = {"phoneNumber": phoneNumber};
 
-      var response = await http.post(Uri.parse(url),
-          body: json.encode(callBody),
-          headers: {"Content-Type": "application/json"});
+      var response = await http.post(
+        Uri.parse(url),
+        body: json.encode(callBody),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token"
+        },
+      );
 
       if (response.statusCode == 200) {
         Fluttertoast.showToast(msg: "Call Initiated successfully");

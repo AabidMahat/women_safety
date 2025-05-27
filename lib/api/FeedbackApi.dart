@@ -11,21 +11,20 @@ import 'package:web_socket_channel/io.dart';
 
 class FeedbackApi {
   List<FeedbackData> _feedback = [];
-  IOWebSocketChannel? _webSocketChannel; // Changed to nullable
-  final StreamController<FeedbackData> _streamController =
-      StreamController<FeedbackData>.broadcast();
+  IOWebSocketChannel? _webSocketChannel;
+  final StreamController<FeedbackData> _streamController = StreamController<FeedbackData>.broadcast();
   String? userId;
 
   Stream<FeedbackData> get feedbackStream => _streamController.stream;
 
-  Future<bool> createFeedback(
-      LatLng location, String comment, String category) async {
+  Future<bool> createFeedback(LatLng location, String comment, String category) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     userId = preferences.getString("userId");
+    String? token = preferences.getString("jwtToken");
+
     bool isSubmitted = false;
     try {
-      final String url = "${MAINURL}/api/v3/feedback/sendFeedback";
-      // final String url = "http://10.0.2.2:3000/api/v3/feedback/sendFeedback";
+      final String url = "$MAINURL/api/v3/feedback/sendFeedback";
 
       var feedbackBody = {
         "location": {
@@ -40,7 +39,10 @@ class FeedbackApi {
       var response = await http.post(
         Uri.parse(url),
         body: json.encode(feedbackBody),
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token"
+        },
       );
 
       if (response.statusCode == 200) {
@@ -56,20 +58,19 @@ class FeedbackApi {
       }
     } catch (err) {
       print("object $err");
-
       Fluttertoast.showToast(msg: err.toString());
       return isSubmitted;
     }
   }
 
-  Future<bool> updateFeedback(
-      String feedbackId, String comment, String category) async {
+  Future<bool> updateFeedback(String feedbackId, String comment, String category) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     userId = preferences.getString("userId");
+    String? token = preferences.getString("jwtToken");
+
     bool isSubmitted = false;
     try {
-      final String url =
-          "${MAINURL}/api/v3/feedback/updateFeedback/$feedbackId";
+      final String url = "$MAINURL/api/v3/feedback/updateFeedback/$feedbackId";
 
       var feedbackBody = {
         "category": category,
@@ -79,7 +80,10 @@ class FeedbackApi {
       var response = await http.patch(
         Uri.parse(url),
         body: json.encode(feedbackBody),
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token"
+        },
       );
 
       if (response.statusCode == 200) {
@@ -95,38 +99,42 @@ class FeedbackApi {
       }
     } catch (err) {
       print("object $err");
-
       Fluttertoast.showToast(msg: err.toString());
       return isSubmitted;
     }
   }
 
   Future<void> getAllFeedback() async {
-    final String url = "${MAINURL}/api/v3/feedback/getAllFeedback";
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? token = preferences.getString("jwtToken");
+
+    final String url = "$MAINURL/api/v3/feedback/getAllFeedback";
     try {
-      var response = await http.get(Uri.parse(url));
+      var response = await http.get(
+        Uri.parse(url),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token"
+        },
+      );
+
       if (response.statusCode == 200) {
         var responseBody = json.decode(response.body);
         print("Response Body $responseBody");
 
         _feedback = List<FeedbackData>.from(
-            responseBody['data'].map((item) => FeedbackData.fromJson(item)));
+          responseBody['data'].map((item) => FeedbackData.fromJson(item)),
+        );
 
-        // Getting real-time feedback
-        _webSocketChannel =
-            IOWebSocketChannel.connect('${WEBSOCKETURL}/feedback');
-        // _webSocketChannel = IOWebSocketChannel.connect('ws://10.0.2.2:3000/feedback');
-
+        _webSocketChannel = IOWebSocketChannel.connect('$WEBSOCKETURL/feedback');
         _webSocketChannel!.sink.add(jsonEncode({"type": "feedbacks"}));
 
         _webSocketChannel!.stream.listen((message) {
           var data = jsonDecode(message);
-
           print("Message From Websocket $data");
 
           if (data['status'] == 'NewFeedback') {
             var newFeedback = FeedbackData.fromJson(data['data']);
-
             _feedback.add(newFeedback);
             _streamController.add(newFeedback);
             Fluttertoast.showToast(msg: "New Feedback Received");
@@ -147,13 +155,14 @@ class FeedbackApi {
     return _feedback;
   }
 
-  Future<Map<String, dynamic>> checkFeedbackAlreadyPresent(
-      LatLng location) async {
+  Future<Map<String, dynamic>> checkFeedbackAlreadyPresent(LatLng location) async {
     Map<String, dynamic> output = {"isPresent": false, "data": {}};
     try {
-      String url = "$MAINURL/api/v3/feedback/checkFeedbackPresent";
       SharedPreferences preferences = await SharedPreferences.getInstance();
       String? userId = preferences.getString("userId");
+      String? token = preferences.getString("jwtToken");
+
+      String url = "$MAINURL/api/v3/feedback/checkFeedbackPresent";
 
       var body = {
         "userId": userId,
@@ -166,12 +175,14 @@ class FeedbackApi {
       var response = await http.post(
         Uri.parse(url),
         body: json.encode(body),
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token"
+        },
       );
 
       if (response.statusCode == 400) {
         Fluttertoast.showToast(msg: "Feedback Already Present");
-
         var data = json.decode(response.body);
         output = {"isPresent": true, "data": data['data']};
       } else {
@@ -185,6 +196,6 @@ class FeedbackApi {
   }
 
   void closeWebSocket() {
-    _webSocketChannel?.sink.close(); // Null-aware operator used
+    _webSocketChannel?.sink.close();
   }
 }

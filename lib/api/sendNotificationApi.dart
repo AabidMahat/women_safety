@@ -14,6 +14,8 @@ class SendNotification {
       String firebaseToken = preferences.getString("firebaseToken")!;
       final String url = "${MAINURL}/api/v3/notification/sendNotification";
 
+      var token = preferences.getString("jwtToken");
+
       var TokenBody = {
         "title": title,
         "body": message,
@@ -27,7 +29,10 @@ class SendNotification {
 
       var response = await http.post(Uri.parse(url),
           body: json.encode(TokenBody),
-          headers: {"Content-Type": "application/json"});
+          headers:{
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          });
       print(response.statusCode);
       if (response.statusCode == 200) {
         Fluttertoast.showToast(msg: "Notification Send");
@@ -58,7 +63,13 @@ class SendNotification {
         "body": "tap to turn on video recording",
         "duration": "30"
       };
-      var response = await http.post(Uri.parse(url), body: TokenBody);
+
+      var response = await http.post(Uri.parse(url), body: TokenBody,
+          headers:{
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          });
+
       print(response.statusCode);
       if (response.statusCode == 200) {
         Fluttertoast.showToast(msg: "Notification Send");
@@ -77,6 +88,8 @@ class SendNotification {
     String url = "${MAINURL}/api/v3/notification/triggerRecording";
     SharedPreferences preferences = await SharedPreferences.getInstance();
 
+    var jwt_token = preferences.getString("jwtToken");
+
     String phoneNumber = preferences.getString("phoneNumber")!;
     String token = await TokenApi().getTokenByPhoneNumber(phoneNumber);
 
@@ -91,7 +104,10 @@ class SendNotification {
     try {
       final response = await http.post(Uri.parse(url),
           body: json.encode(recordBody),
-          headers: {"Content-Type": "application/json"});
+          headers:{
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $jwt_token',
+          });
 
       if (response.statusCode == 200) {
         Fluttertoast.showToast(msg: "Recording triggered successfully");

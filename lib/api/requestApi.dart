@@ -1,8 +1,6 @@
 import 'dart:convert';
-
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:flutter/cupertino.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,13 +15,19 @@ class RequestApi {
     try {
       final String url = "$MAINURL/api/v3/request/createRequest";
 
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+      var token = preferences.getString("jwtToken");
+
       print("Request Api $guardianData");
 
       var body = {"userId": userId, "guardianData": guardianData};
 
       final response = await http.post(Uri.parse(url),
           body: json.encode(body),
-          headers: {"Content-Type": "application/json"});
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token"
+          });
 
       if (response.statusCode == 200) {
         Fluttertoast.showToast(msg: "Request send to guardian");
@@ -39,6 +43,7 @@ class RequestApi {
   Future<List<Request>> getGuardianWithPhone() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String? phoneNumber = preferences.getString("phoneNumber");
+    var token = preferences.getString("jwtToken");
 
     try {
       final String url = "$MAINURL/api/v3/request/gurdianWithPhoneNUmber";
@@ -47,7 +52,10 @@ class RequestApi {
 
       final response = await http.post(Uri.parse(url),
           body: json.encode(body),
-          headers: {"Content-Type": "application/json"});
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token"
+          });
 
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
@@ -72,6 +80,8 @@ class RequestApi {
       List<Map<String, String>> data, BuildContext context) async {
     final String url = "$MAINURL/api/v3/request/deleteRequest";
 
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    var token = preferences.getString("jwtToken");
 
     print(data);
 
@@ -80,7 +90,10 @@ class RequestApi {
 
       final response = await http.delete(Uri.parse(url),
           body: json.encode(body),
-          headers: {"Content-Type": "application/json"});
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token"
+          });
 
       if (response.statusCode == 200) {
         Fluttertoast.showToast(msg: "Requests removed");
@@ -104,6 +117,7 @@ class RequestApi {
     try {
       SharedPreferences preferences = await SharedPreferences.getInstance();
       String? userId = preferences.getString("userId");
+      var token = preferences.getString("jwtToken");
 
       print("User data $data");
       final String url = "$MAINURL/api/v3/request/updateStatus";
@@ -112,7 +126,10 @@ class RequestApi {
 
       final response = await http.patch(Uri.parse(url),
           body: json.encode(body),
-          headers: {"Content-Type": "application/json"});
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token"
+          });
 
       if (response.statusCode == 200) {
         Fluttertoast.showToast(msg: "Request Status modified");
@@ -135,10 +152,15 @@ class RequestApi {
     try {
       SharedPreferences preferences = await SharedPreferences.getInstance();
       String? userId = preferences.getString("userId");
+      var token = preferences.getString("jwtToken");
 
       final String url = "$MAINURL/api/v3/request/getUserbyId/$userId";
 
-      var response = await http.get(Uri.parse(url));
+      var response =
+      await http.get(Uri.parse(url), headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token"
+      });
 
       if (response.statusCode == 200) {
         var data = json.decode(response.body);

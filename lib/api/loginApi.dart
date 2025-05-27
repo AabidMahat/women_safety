@@ -33,6 +33,7 @@ class LoginApi {
         preferences.setString("username", body['data']['name']);
         preferences.setString("avatar", body['data']['avatar']);
         preferences.setString("message", body['data']['message_template']);
+        preferences.setString("jwtToken", body['jwtToken']);
 
         // List<dynamic> communitiesDynamic = body['data']['communities']?? [];
         List<String> communities = List<String>.from(body['data']['communities'] ?? []);
